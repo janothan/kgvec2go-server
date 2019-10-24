@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block query_active %}active{% endblock %}
+{% block header_1 %}Query the Data in Your Browser{% endblock %}
+{% block script_include %}<script type='text/javascript' src="/static/scripts.js"></script>{% endblock %}
+{% block content_1 %}
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+        <a id="wordnet-nav" class="nav-link active" href="#">WordNet</a>
+    </li>
+    <li class="nav-item">
+        <a id="wiktionary-nav" class="nav-link" href="#">Wiktionary</a>
+    </li>
+    <li class="nav-item">
+        <a id="babelnet-nav" class="nav-link" href="#">BabelNet</a>
+    </li>
+    <li class="nav-item">
+        <a id="alod-nav" class="nav-link" href="#">ALOD</a>
+    </li>
+</ul>
+<br/>
+<div class="input-group mb-3">
+    <input id="search_field" type="text" class="form-control" placeholder="Search Term" aria-label="Search Term"
+           aria-describedby="button-addon2">
+    <div class="input-group-append">
+        <button id="query-search-button" class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+    </div>
+    <br/><br/>
+</div>
+    <div id = "query-result"></div>
+{% endblock %}
