@@ -30,6 +30,7 @@ def show_api_page():
 def show_about_page():
     return render_template("about.html")
 
+"""
 dbnary_service = DbnaryQueryService(entity_file="./dbnary/dbnary_500_8_pages/dbnary_entities.txt",
                              model_file="./dbnary/dbnary_500_8_pages/sg200_dbnary_500_8_pages")
 
@@ -37,6 +38,7 @@ wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordn
                                          model_file='./wordnet/wordnet_500_8/sg200_wordnet_500_8')
 
 alod_service = AlodQueryService(model_file="./alod/alod_500_4/sg200_alod_500_4")
+
 
 @app.route('/rest/closest-concepts/<data_set>/<top_n>/<concept_name>', methods=['GET'])
 def closest_concepts(data_set, top_n, concept_name):
@@ -107,3 +109,8 @@ def get_similarity(data_set, concept_name_1, concept_name_2):
         result = alod_service.get_similarity_json(concept_name_1, concept_name_2)
         print(result)
         return result
+
+"""
+
+if __name__ == "__main__":
+    app.run(debug=False)
