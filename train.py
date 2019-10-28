@@ -9,7 +9,7 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', filename
 def main():
 
     # define the path to the sentences below
-    path_to_sentences = r'C:\Users\D060249\Documents\Walk-Generator\walks\dbnary_500_4_pages_df'
+    path_to_sentences = r'/Users/janportisch/IdeaProjects/Walk-Generator/walks/wordnet_500_8_df'
 
     # a memory-friendly iterator
     class MySentences(object):
@@ -36,7 +36,7 @@ def main():
     print('Sentences Object successfully initialized.')
 
     # sg 200
-    model = gensim.models.Word2Vec(size=200, workers=40, window=5, sg=1, negative=25, iter=5)
+    model = gensim.models.Word2Vec(size=200, workers=10, window=5, sg=1, negative=25, iter=5)
     print('Gensim Model SG 200 initialized. Building vocabulary...')
 
     # Build Vocabulary
@@ -44,8 +44,8 @@ def main():
     print('Vocabulary successfully built.')
 
     print('Training SG 200')
-    sg200name = 'sg200_dbnary_pages_500_4_df'
-    model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.iter)
+    sg200name = 'sg200_wordnet_500_8_df_with_strings'
+    model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
 
     print('SG 200 trained - Saving...')
     model.save(sg200name)

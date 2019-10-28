@@ -29,6 +29,8 @@ class Evaluator:
             similarity = service.get_similarity(entry[0], entry[1])
             if similarity is None:
                 print("ERROR: Not found: " + entry[0] + "   " + entry[1])
+                service_similarity.append(0)
+                wordsim_similarity.append(entry[2])
             else:
                 service_similarity.append(similarity)
                 wordsim_similarity.append(entry[2])
@@ -47,6 +49,8 @@ class Evaluator:
                 similarity = service.get_similarity(entry[0], entry[1])
             if similarity is None:
                 print("ERROR: Not found: " + entry[0] + "   " + entry[1])
+                service_similarity.append(0)
+                simlex_similarity.append(entry[3])
             else:
                 service_similarity.append(similarity)
                 simlex_similarity.append(entry[3])
@@ -88,6 +92,8 @@ class Evaluator:
                 similarity = service.get_similarity(entry[0], entry[2])
             if similarity is None:
                 print("ERROR: Not found: " + entry[0] + "   " + entry[2])
+                service_similarity.append(0)
+                men_similarity.append(entry[4])
             else:
                 service_similarity.append(similarity)
                 men_similarity.append(entry[4])
@@ -154,15 +160,15 @@ def main():
     # dbnary_service = DbnaryQueryService(entity_file="../dbnary/dbnary_500_4_df_pages/dbnary_entities.txt",
     #                                   model_file="../dbnary/dbnary_500_4_df_pages/sg200_dbnary_pages_500_4_df")
 
-    # wordnet_service = WordnetQueryService(entity_file='../wordnet/wordnet_500_4_df/wordnet_entities.txt',
-    #                                       model_file='../wordnet/wordnet_500_4_df/sg200_wordnet_500_4_df')
+    wordnet_service = WordnetQueryService(entity_file='../wordnet/wordnet_500_8/wordnet_entities.txt',
+                                           model_file='../sg200_wordnet_500_8_df_with_strings')
 
-    babelnet_service = BabelNetQueryService('entity_file', model_file='', vector_file='')
+    # babelnet_service = BabelNetQueryService('entity_file', model_file='', vector_file='')
 
-    print("WordSim-353: " + str(evaluator.wordsim_spearman_rho(r"C:\Users\D060249\Documents\Vector_Evaluation\wordsim353_sim_rel\wordsim_similarity_goldstandard.txt", babelnet_service)))
-    print("SimLex-999: " + str(evaluator.simlex_spearman_rho(r"C:\Users\D060249\Downloads\SimLex-999\SimLex-999.txt", babelnet_service, nouns_only=False, use_pos=False)))
-    print("MEN: " + str(evaluator.men_spearman_rho(r"C:\Users\D060249\Downloads\MEN\MEN\MEN_dataset_lemma_form_full", babelnet_service,
-                                     nouns_only=False, use_pos=False)))
+    print("WordSim-353: " + str(evaluator.wordsim_spearman_rho(r"../gold_standards/wordsim_similarity_goldstandard.txt", wordnet_service)))
+    print("SimLex-999: " + str(evaluator.simlex_spearman_rho(r"../gold_standards/SimLex-999.txt", wordnet_service, nouns_only=False, use_pos=True)))
+    print("MEN: " + str(evaluator.men_spearman_rho(r"../gold_standards/MEN_dataset_lemma_form_full.txt", wordnet_service,
+                                     nouns_only=False, use_pos=True)))
 
 if __name__ == "__main__":
     main()
