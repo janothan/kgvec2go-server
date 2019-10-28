@@ -144,3 +144,11 @@ sg200_dbnary_pages_500_4_df
 sg200_alod_500_4
 sg200_wordnet_500_8_vector_file
 sg200_wordnet_500_8_df_with_strings
+
+# Mac
+.DS_Store
+
+# Excplicitly include gold standard
+!gold_standards/MEN_dataset_lemma_form_full.txt
+!gold_standards/SimLex-999.txt
+!gold_standards/wordsim_similarity_goldstandard.txt
