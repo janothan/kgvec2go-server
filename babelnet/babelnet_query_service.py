@@ -79,8 +79,15 @@ class BabelNetQueryService:
             if ("_" + pos + "_EN") in candidate:
                 return candidate
 
+        # pos not found, try noun
+        if pos != "n":
+            pos = "n"
+            for candidate in set_to_pick_from:
+                if("_" + pos + "_EN") in candidate:
+                    return candidate
+
         # no POS match, no exact match, return any
-        return candidate[0]
+        return tuple(set_to_pick_from)[0]
 
 
     def __transform_string(self, string_to_be_transformed):

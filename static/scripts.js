@@ -5,6 +5,7 @@ $('document').ready( function(){
             $('#wordnet-nav').removeClass('active');
             $('#babelnet-nav').removeClass('active');
             $('#alod-nav').removeClass('active');
+            $('#dbpedia-nav').removeClass('active');
     });
 
     $('#babelnet-nav').click(
@@ -13,6 +14,7 @@ $('document').ready( function(){
             $('#wordnet-nav').removeClass('active');
             $('#babelnet-nav').addClass('active');
             $('#alod-nav').removeClass('active');
+            $('#dbpedia-nav').removeClass('active');
     });
 
     $('#wordnet-nav').click(
@@ -21,6 +23,7 @@ $('document').ready( function(){
             $('#wordnet-nav').addClass('active');
             $('#babelnet-nav').removeClass('active');
             $('#alod-nav').removeClass('active');
+            $('#dbpedia-nav').removeClass('active');
     });
 
     $('#alod-nav').click(
@@ -29,6 +32,16 @@ $('document').ready( function(){
             $('#wordnet-nav').removeClass('active');
             $('#babelnet-nav').removeClass('active');
             $('#alod-nav').addClass('active');
+            $('#dbpedia-nav').removeClass('active');
+    });
+
+    $('#dbpedia-nav').click(
+        function(){
+            $('#alod-nav').removeClass('active');
+            $('#wordnet-nav').removeClass('active');
+            $('#babelnet-nav').removeClass('active');
+            $('#alod-nav').removeClass('active');
+            $('#dbpedia-nav').addClass('active');
     });
 
     $('#query-search-button').click(
