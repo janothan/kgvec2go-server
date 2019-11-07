@@ -9,7 +9,9 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', filename
 def main():
 
     # define the path to the sentences below
-    path_to_sentences = r'/Users/janportisch/IdeaProjects/Walk-Generator/walks/wordnet_500_8_df'
+    path_to_sentences = r'/work/jportisc/Walk_Generation_babelnet_100_8_df_mt/walks_df_babelnet_100_en/'
+    sg200name = 'sg200_babelnet_100_8_df_mc1_updated'
+
 
     # a memory-friendly iterator
     class MySentences(object):
@@ -20,79 +22,35 @@ def main():
             for fname in os.listdir(self.dirname):
                 print("Processing file: " + fname)
                 try:
-                    for line in gzip.open(os.path.join(self.dirname, fname), mode='rt', errors='ignore'):
+                    for line in gzip.open(os.path.join(self.dirname, fname), mode='rt', encoding="utf-8"):
                         line = line.rstrip('\n')
                         words = line.split(" ")
                         yield words
                 except Exception:
-                    print("Failed reading file:")
-                    print(fname)
+                    logging.error("Failed reading file:")
+                    logging.error(fname)
 
 
-    print("Starting Process")
+    logging.info("Starting Process")
 
     # init
     sentences = MySentences(path_to_sentences)
-    print('Sentences Object successfully initialized.')
+    logging.info('Sentences Object successfully initialized.')
 
     # sg 200
-    model = gensim.models.Word2Vec(size=200, workers=10, window=5, sg=1, negative=25, iter=5)
-    print('Gensim Model SG 200 initialized. Building vocabulary...')
+    model = gensim.models.Word2Vec(size=200, workers=20, sample=0, min_count=1, window=5, sg=1, negative=25, iter=5, sentences=sentences)
+    #print('Gensim Model SG 200 initialized. Building vocabulary...')
 
     # Build Vocabulary
-    model.build_vocab(sentences)
-    print('Vocabulary successfully built.')
+    #model.build_vocab(sentences)
+    #print('Vocabulary successfully built.')
 
-    print('Training SG 200')
-    sg200name = 'sg200_wordnet_500_8_df_with_strings'
-    model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
+    #print('Training SG 200')
+    #model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
 
-    print('SG 200 trained - Saving...')
+    logging.info('SG 200 trained - Saving...')
     model.save(sg200name)
-    # rewrite_model_for_java_gzipped(path_to_model=sg200name, path_to_output_file=(sg200name + "_java.gz"))
-    print('SG 200 saved.')
-
-    # cbow 200 model
-    # model_cbow200 = gensim.models.Word2Vec(size=200, workers=5, window=2, sg=0, iter=5, cbow_mean=1, alpha=0.05)
-    # model_cbow200.reset_from(model)
-
-    # sg 500 model
-    # model_sg500 = gensim.models.Word2Vec(size=500, workers=5, window=2, sg=1, negative=25, iter=5)
-    # model_sg500.reset_from(model)
-
-    # cbow 500 model
-    # model_cbow500 = gensim.models.Word2Vec(size=500, workers=5, window=2, sg=0, iter=5, cbow_mean=1, alpha=0.05)
-    # model_cbow500.reset_from(model)
-
-    del model
-
-    # print('Training CBOW 200.')
-    # cbow_200_name = 'cobw_200'
-    # model_cbow200.train(sentences=sentences, total_examples=model_cbow200.corpus_count, epochs=model_cbow200.iter)
-    # print('CBOW 200 trained - Saving...')
-    # model_cbow200.save(cbow_200_name)
-    # rewrite_model_for_java_gzipped(path_to_model=cbow_200_name, path_to_output_file=(cbow_200_name + "_java.gz"))
-    # print('CBOW 200 saved.')
-
-    # del model_cbow200
-    # print('Dimension 200 completed. Next: Dimesnion 500.')
-
-    # print('Training SG 500')
-    # sg500_name = 'sg_500'
-    # model_sg500.train(sentences=sentences, total_examples=model_sg500.corpus_count, epochs=model_sg500.iter)
-    # print('SG 500 trained.')
-    # model_sg500.save(sg500_name)
-    # rewrite_model_for_java_gzipped(path_to_model=sg500_name, path_to_output_file=(sg500_name + "_java.gz"))
-    # print('SG 500 saved.')
-    # del model_sg500
-
-    # print('Training CBOW 500')
-    # cbow500_name = 'DB2Vec_cbow_500_classic_100_8_no_reverse_window5'
-    # model_cbow500.train(sentences=sentences, total_examples=model_cbow500.corpus_count, epochs=model_cbow500.iter)
-    # print('SG 500 trained')
-    # model_cbow500.save(cbow500_name)
-    # rewrite_model_for_java_gzipped(path_to_model=cbow500_name, path_to_output_file=(cbow500_name + "_java.gz"))
-    # del model_cbow500
+    logging.info('SG 200 saved.')
 
     print("DONE")
 

@@ -1,5 +1,6 @@
 import gensim
 from collections import namedtuple
+from gensim.models import KeyedVectors
 
 
 class DbnaryQueryService:
@@ -7,10 +8,17 @@ class DbnaryQueryService:
 
     """
 
-    def __init__(self, entity_file, model_file):
+    def __init__(self, entity_file='', model_file='', vector_file='', is_reduced_vector_file=False):
+        if vector_file == '':
+            self.model = gensim.models.Word2Vec.load(model_file)
+            self.vectors = self.model.wv
+        else:
+            self.vectors = KeyedVectors.load(vector_file, mmap='r')
+
+        self.is_reduced_vector_file = is_reduced_vector_file
         self.all_lemmas = self.__read_lemmas(entity_file)
-        self.model = gensim.models.Word2Vec.load(model_file)
         self.term_mapping = self.__map_terms(self.all_lemmas)
+
 
     def __map_terms(self, all_lemmas):
         result = {}
@@ -33,28 +41,37 @@ class DbnaryQueryService:
         """
 
         string_to_be_transformed = string_to_be_transformed.replace("http://kaiko.getalp.org/dbnary/eng/", "")
-        string_to_be_transformed = string_to_be_transformed.lower()
+        # string_to_be_transformed = string_to_be_transformed.lower()
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
         return string_to_be_transformed
 
     def __read_lemmas(self, path_to_lemma_file):
-        result = []
-        with open(path_to_lemma_file, errors='ignore') as lemma_file:
-            for lemma in lemma_file:
-                result.append(lemma.replace("\n", ""))
-        print("Dbnary lemmas read.")
-        return result
+        if self.is_reduced_vector_file:
+            return self.vectors.vocab
+        else:
+            result = []
+            with open(path_to_lemma_file, errors='ignore') as lemma_file:
+                for lemma in lemma_file:
+                    lemma = lemma.replace("\n", "").replace("\r", "")
+                    result.append(lemma)
+                    #if lemma not in self.vectors.vocab:
+                    #    print(lemma + " not in vocabulary.")
+            print("Dbnary lemmas read.")
+            return result
 
     def find_closest_lemmas_given_key(self, key, top):
-        if key not in self.model.wv.vocab:
+        if key not in self.self.vectors.vocab:
             return None
-        result_list = []
-        ResultEntry = namedtuple('ResultEntry', 'concept similarity')
-        for concept in self.all_lemmas:
-            result_list.append(ResultEntry(concept, self.model.wv.similarity(key, concept)))
-        result_list.sort(key=self.__take_second, reverse=True)
-        result_list = result_list[:int(top)]
+        if self.is_reduced_vector_file:
+            result_list = self.vectors.most_similar(positive=key, topn=top)
+        else:
+            result_list = []
+            ResultEntry = namedtuple('ResultEntry', 'concept similarity')
+            for concept in self.all_lemmas:
+                result_list.append(ResultEntry(concept, self.self.vectors.similarity(key, concept)))
+            result_list.sort(key=self.__take_second, reverse=True)
+            result_list = result_list[:int(top)]
         result = '{\n"result": [\n'
         is_first = True
         for entry in result_list:
@@ -82,7 +99,7 @@ class DbnaryQueryService:
         lookup_key = self.__transform_string(lemma)
         if lookup_key in self.term_mapping:
             uri = self.term_mapping[lookup_key]
-            vector = self.model.wv.get_vector(uri)
+            vector = self.vectors.get_vector(uri)
             return '{ "uri": "' + uri + '",\n"vector": ' + self.__to_json_arry(vector) + '}'
         else:
             return "{}"
@@ -116,12 +133,44 @@ class DbnaryQueryService:
                 """
         lookup_key_1 = self.__transform_string(concept_1)
         lookup_key_2 = self.__transform_string(concept_2)
-        a = self.term_mapping[lookup_key_1]
-        b = self.term_mapping[lookup_key_2]
-        if lookup_key_1 in self.term_mapping and lookup_key_2 in self.term_mapping:
-            return self.model.wv.similarity(self.term_mapping[lookup_key_1], self.term_mapping[lookup_key_2])
-        else:
+
+        #try:
+        #    mapping_1 = self.term_mapping[lookup_key_1]
+        #    mapping_2 = self.term_mapping[lookup_key_2]
+        #    print(concept_1 + " mapped to " + str(mapping_1))
+        #    print(concept_2 + " mapped to " + str(mapping_2))
+        #except KeyError:
+        #    #not important, just logging
+        #    pass
+
+        if lookup_key_1 not in self.term_mapping:
+            if lookup_key_1[0].islower():
+                print("Could not find " + lookup_key_1)
+                lookup_key_1 = lookup_key_1[0].upper() + lookup_key_1[1:]
+                print("Trying " + lookup_key_1)
+                if lookup_key_1 not in self.term_mapping:
+                    print("Coud not find " + concept_1)
+                    return None
+
+        if lookup_key_2 not in self.term_mapping:
+            if lookup_key_2[0].islower():
+                print("Could not find " + lookup_key_2)
+                lookup_key_2 = lookup_key_2[0].upper() + lookup_key_2[1:]
+                print("Trying " + lookup_key_2)
+                if lookup_key_2 not in self.term_mapping:
+                    print("Coud not find " + concept_2)
+                    return None
+
+        try:
+            similarity = self.vectors.similarity(self.term_mapping[lookup_key_1], self.term_mapping[lookup_key_2])
+            #print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
+            return similarity
+        except KeyError:
+            print("KeyError: One of the following concepts not found in vocabulary.")
+            print("\t " + str(self.term_mapping[lookup_key_1]))
+            print("\t " + str(self.term_mapping[lookup_key_2]))
             return None
+
 
     def get_similarity_json(self, concept_1, concept_2):
         """Calculate the similarity between the two given concepts.
@@ -144,8 +193,6 @@ class DbnaryQueryService:
             return "{}"
         else:
             return '{ "result" : ' + str(similarity) + " }"
-
-
 
 
 def main():

@@ -14,13 +14,12 @@ class AlodQueryService:
         elif model_file != '':
             print("Load alod classic model.")
             self.model = gensim.models.Word2Vec.load(model_file)
-            print("Write vector file.")
-            vector_file = get_tmpfile(self.__get_file_name(model_file))
-            print("Writing vector file: " + str(vector_file))
-            self.model.wv.save(vector_file)
-            self.word_vectors = KeyedVectors.load(vector_file, mmap='r')
+            #print("Write vector file.")
+            #vector_file = get_tmpfile(self.__get_file_name(model_file))
+            #print("Writing vector file: " + str(vector_file))
+            #self.model.wv.save(vector_file)
+            self.word_vectors = self.model.wv
         elif vector_file != '':
-            vector_file = get_tmpfile(self.__get_file_name(vector_file))
             self.word_vectors = KeyedVectors.load(vector_file, mmap='r')
 
         self.all_lemmas = self.__read_lemmas()

@@ -2,11 +2,13 @@ from flask import Flask, render_template
 
 from dbnary.dbnary_query_service import DbnaryQueryService
 from alod.alod_query_service import AlodQueryService
+from dbpedia.dbpedia_query_service import DBpediaQueryService
 from wordnet.wordnet_query_service import WordnetQueryService
 
 app = Flask(__name__)
 
 @app.route('/index.html')
+@app.route("/")
 def show_start_page():
     return render_template("query.html")
 
@@ -30,7 +32,7 @@ def show_api_page():
 def show_about_page():
     return render_template("about.html")
 
-"""
+
 dbnary_service = DbnaryQueryService(entity_file="./dbnary/dbnary_500_8_pages/dbnary_entities.txt",
                              model_file="./dbnary/dbnary_500_8_pages/sg200_dbnary_500_8_pages")
 
@@ -39,33 +41,41 @@ wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordn
 
 alod_service = AlodQueryService(model_file="./alod/alod_500_4/sg200_alod_500_4")
 
+dbpedia_service = DBpediaQueryService(entity_file="", model_file="")
+
 
 @app.route('/rest/closest-concepts/<data_set>/<top_n>/<concept_name>', methods=['GET'])
 def closest_concepts(data_set, top_n, concept_name):
-    data_sets = ["wordnet", "wiktionary", "babelnet", "alod"]
+    data_sets = ["wordnet", "wiktionary", "babelnet", "alod", "dbpedia"]
     data_set = data_set.lower()
     if data_set not in data_sets:
         return None
     if data_set == 'wiktionary':
-        print("Wiktionary query fired.")
+        print("Wiktionary closest-concepts query fired.")
         result = dbnary_service.find_closest_lemmas(concept_name, top_n)
         print(result)
         return result
     elif data_set == 'wordnet':
-        print("Wordnet query fired.")
+        print("Wordnet closest-concepts query fired.")
         result = wordnet_service.find_closest_lemmas(concept_name, top_n)
         print(result)
         return result
-    elif data_set =="alod":
-        print("ALOD Classic query fired.")
+    elif data_set == "alod":
+        print("ALOD Classic closest-concepts query fired.")
         result = alod_service.find_closest_lemmas(concept_name, top_n)
+        print(result)
+        return result
+    elif data_set == 'dbpedia':
+        print("DBpedia closts-concepts query fired.")
+        result = dbpedia_service.find_closest_lemmas(concept_name, top_n)
         print(result)
         return result
     return None
 
+
 @app.route('/rest/get-vector/<data_set>/<concept_name>', methods=['GET'])
 def get_vector(data_set, concept_name):
-    data_sets = ["wordnet", "wiktionary", "babelnet", "alod"]
+    data_sets = ["wordnet", "wiktionary", "babelnet", "alod", "dbpedia"]
     data_set = data_set.lower()
     if data_set not in data_sets:
         return None
@@ -84,11 +94,17 @@ def get_vector(data_set, concept_name):
         result = alod_service.get_vector(concept_name)
         print(result)
         return result
+    elif data_set == 'dbpedia':
+        print("DBpedia get-vector query fired.")
+        result = dbpedia_service.get_vector(concept_name)
+        print(result)
+        return result
     return None
+
 
 @app.route('/rest/get-similarity/<data_set>/<concept_name_1>/<concept_name_2>', methods=['GET'])
 def get_similarity(data_set, concept_name_1, concept_name_2):
-    data_sets = ["wordnet", "wiktionary", "babelnet", "alod"]
+    data_sets = ["wordnet", "wiktionary", "babelnet", "alod", "dbpedia"]
     data_set = data_set.lower()
     if data_set not in data_sets:
         return None
@@ -109,8 +125,12 @@ def get_similarity(data_set, concept_name_1, concept_name_2):
         result = alod_service.get_similarity_json(concept_name_1, concept_name_2)
         print(result)
         return result
+    elif data_set == 'dbpedia':
+        print("DBpedia get-similarity query fired.")
+        result = dbpedia_service.get_similarity_json(concept_name_1, concept_name_2)
+        print(result)
+        return result
 
-"""
 
 if __name__ == "__main__":
     app.run(debug=False)

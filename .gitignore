@@ -152,3 +152,12 @@ sg200_wordnet_500_8_df_with_strings
 !gold_standards/MEN_dataset_lemma_form_full.txt
 !gold_standards/SimLex-999.txt
 !gold_standards/wordsim_similarity_goldstandard.txt
+
+mini_model.py
+model_shrinked.kv
+test_model
+test_model_vectors.kv
+test_model_vectors_reduced.kv
+test.py
+evaluation_tmp.txt
+__pycache__

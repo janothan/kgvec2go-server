@@ -8,16 +8,22 @@ from collections import namedtuple
 class BabelNetQueryService:
 
     def __init__(self, entity_file, model_file='', vector_file=''):
+
+        self.all_lemmas = self.__read_lemmas(entity_file)
+
+        # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
+        self.term_mapping = self.__map_terms(self.all_lemmas)
+
         if model_file == '' and vector_file == '':
                 print("ERROR - At least one file must be given.")
         elif model_file != '':
             print("Load BabelNet model.")
             self.model = gensim.models.Word2Vec.load(model_file)
-            print("Write vector file.")
-            vector_file = get_tmpfile(self.__get_file_name(model_file))
-            print("Writing vector file: " + str(vector_file))
-            self.model.wv.save(vector_file)
-            self.word_vectors = KeyedVectors.load(vector_file, mmap='r')
+            #vector_file = get_tmpfile(self.__get_file_name(model_file))
+            if vector_file != '':
+                print("Writing vector file: " + str(vector_file))
+                self.model.wv.save(vector_file)
+            self.word_vectors = self.model.wv
         elif vector_file != '':
             try:
                 vector_file_path = get_tmpfile(self.__get_file_name(vector_file))
@@ -26,31 +32,39 @@ class BabelNetQueryService:
                 vector_file_path = vector_file
                 self.word_vectors = KeyedVectors.load(vector_file_path, mmap='r')
 
-        self.all_lemmas = self.__read_lemmas(entity_file)
 
-        # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
-        self.term_mapping = self.__map_terms(self.all_lemmas)
 
     def __map_terms(self, all_lemmas):
         result = {}
         for uri in all_lemmas:
-            lookup_key = self.__transform_string(uri)
+            lookup_key = self.transform_string(uri)
             if lookup_key in result:
                 result[lookup_key].add(uri)
             else:
                 result[lookup_key] = {uri}
+        print("Term mapping created. Size: " + str(len(result)))
+        print("Example:")
+        iteration_number = 0
+        for k, v in result.items():
+            iteration_number += 1
+            print("Key: " + k )
+            for value in v:
+                print("Value for " + k + ": " + value)
+            if iteration_number > 10:
+                break
+        print("End of example.")
         return result
 
-    def get_vector(self, search_term, pos='n'):
+    def get_lookup_key(self, search_term, pos='n'):
         """
         Best effort: If there is no vector for the given POS but a string match with another POS,
         that vector will be returned. Mini test case:
 
-        print(self.get_vector("sleep", pos='n')) # bn:sleep_n_EN
-        print(self.get_vector("sleep", pos='v')) # bn:sleep_v_EN
-        print(self.get_vector("Sleep", pos='n')) # bn:Sleep_n_EN
-        print(self.get_vector("Sleep")) # bn:Sleep_n_EN
-        print(self.get_vector("sleep")) # bn:sleep_n_EN
+        print(self.get_lookup_key("sleep", pos='n')) # bn:sleep_n_EN
+        print(self.get_lookup_key("sleep", pos='v')) # bn:sleep_v_EN
+        print(self.get_lookup_key("Sleep", pos='n')) # bn:Sleep_n_EN
+        print(self.get_lookup_key("Sleep")) # bn:Sleep_n_EN
+        print(self.get_lookup_key("sleep")) # bn:sleep_n_EN
 
         Parameters
         ----------
@@ -61,7 +75,7 @@ class BabelNetQueryService:
         -------
 
         """
-        lookup_key = self.__transform_string(search_term)
+        lookup_key = self.transform_string(search_term)
         pos = pos.lower()
         result = None
         if lookup_key not in self.term_mapping:
@@ -90,7 +104,8 @@ class BabelNetQueryService:
         return tuple(set_to_pick_from)[0]
 
 
-    def __transform_string(self, string_to_be_transformed):
+    @staticmethod
+    def transform_string(string_to_be_transformed):
         """Transforms any string for lookup, also URIs.
 
         Parameters
@@ -104,11 +119,9 @@ class BabelNetQueryService:
             Transformed string.
         """
 
-        string_to_be_transformed = string_to_be_transformed.lower()
+        #string_to_be_transformed = string_to_be_transformed.lower()
         string_to_be_transformed = string_to_be_transformed.lstrip("bn:")
-        string_to_be_transformed = re.sub("_[a-zA-Z]{1}_en$", "", string_to_be_transformed)
-
-
+        string_to_be_transformed = re.sub("_[a-zA-Z]{1}_(en|EN)$", "", string_to_be_transformed)
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
         string_to_be_transformed = string_to_be_transformed.replace("'", "_")
@@ -119,7 +132,7 @@ class BabelNetQueryService:
         result = []
         with open(path_to_lemma_file, errors='ignore') as lemma_file:
             for lemma in lemma_file:
-                result.append(lemma.replace("\n", ""))
+                result.append(lemma.replace("\n", "").replace("\r", ""))
         print("BabelNet lemmas read.")
         return result
 
@@ -145,7 +158,7 @@ class BabelNetQueryService:
 
     def find_closest_lemmas(self, lemma, top):
         print("Closest lemma query for " + lemma + " received.")
-        lookup_key = self.__transform_string(lemma)
+        lookup_key = self.transform_string(lemma)
         if lookup_key in self.all_lemmas:
             return self.find_closest_lemmas_given_key(key=self.all_lemmas[lookup_key], top=top)
         else:
@@ -156,7 +169,7 @@ class BabelNetQueryService:
         return element[1]
 
     def get_vector_json(self, lemma, pos='n'):
-        vector = self.get_vector(lemma, pos)
+        vector = self.get_lookup_key(lemma, pos)
         if vector is None:
             return "{}"
         return '{ "uri": "' + vector + '",\n"vector": ' + self.__to_json_arry(vector) + '}'
@@ -183,19 +196,25 @@ class BabelNetQueryService:
             float
                 Similarity. If no concepts can be found: None.
         """
-        vector_1 = self.get_vector(concept_1, pos_1)
-        vector_2 = self.get_vector(concept_2, pos_2)
-        if vector_1 is None:
-            print("Concept '" + concept_1 + "' could not be found.")
+        lookup_key_1 = self.get_lookup_key(concept_1, pos_1)
+        lookup_key_2 = self.get_lookup_key(concept_2, pos_2)
+        if lookup_key_1 is None:
+            print("[babelnet_query_service#get_similarity] Concept '" + concept_1 + "' could not be found.")
             return None
-        if vector_2 is None:
-            print("Concept '" + concept_2 + "' could not be found.")
+        if lookup_key_2 is None:
+            print("[babelnet_query_service#get_similarity] Concept '" + concept_2 + "' could not be found.")
             return None
         try:
-            similarity = self.word_vectors.similarity(vector_1, vector_2)
+            print("Find similarity for:")
+            print(lookup_key_1)
+            print(lookup_key_2)
+            similarity = self.word_vectors.similarity(lookup_key_1, lookup_key_2)
+            print("Similarity = " + str(similarity))
             return similarity
         except KeyError:
             print("A key error occurred for tuple: (" + concept_1 + " | " + concept_2 + ")")
+            print("Lookup key 1: " + lookup_key_1)
+            print("Lookup key 2: " + lookup_key_2)
             return None
 
     def get_similarity_json(self, concept_1, concept_2, pos_1='n', pos_2='n'):
@@ -242,12 +261,14 @@ class BabelNetQueryService:
 
 def main():
     print("Start")
-    service = BabelNetQueryService(vector_file="./sg200_babelnet_100_8_vectors", entity_file="./babelnet_entities_en.txt")
+    print(BabelNetQueryService.transform_string("Gold_smith_n_EN"))
+    #service = BabelNetQueryService(vector_file="./sg200_babelnet_100_8_vectors", entity_file="./babelnet_entities_en.txt")
     #print(service.get_vector('sleep'))
     #print(service.find_closest_lemmas('sleep', 10))
-    print(service.get_similarity("car", "amex"))
-    print(service.get_similarity("truck", "car"))
-    print(service.get_similarity("car", "vacation"))
+    #print(service.get_similarity("car", "amex"))
+    #print(service.get_similarity("truck", "car"))
+    #print(service.get_similarity("car", "vacation"))
+
     print("End")
 
 

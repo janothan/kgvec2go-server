@@ -4,37 +4,6 @@
 {% block content_1 %}
 <p>In the following, the available REST services are described. There are 3 services available: <code>closest-concepts</code>,
 <code>get-vector</code>, and <code>get-similarity</code>.</p>
-<h2>N Closest Concepts</h2>
-<p>This service is also used for the Web UI demo.<br/>General structure of the REST call:</p>
-<pre><code>[GET] /rest/closest-concepts/<var>&lt;data_set&gt;</var>/<var>&lt;top_n&gt;</var>/<var>&lt;concept_name&gt;</var></code></pre>
-<h3>Parameters</h3>
-<p>
-<ul>
-    <li><code>data_set</code><br/>The data set you want to query. Available values are:</li>
-    <ul>
-        <li><code>wordnet</code></li>
-        <li><code>wiktionary</code></li>
-        <li><code>babelnet</code></li>
-        <li><code>alod</code></li>
-    </ul>
-    <li><code>top_n</code><br/>The number of closets concepts that shall be retrieved.</li>
-    <li><code>concept_name</code><br/>The name of the concept you want to query for. If the concept cannot be found, the response will be empty.</li>
-</ul>
-<h3>Example</h3>
-In the following, an example is given for the concept <it>sleep</it> on data set <it>wiktionary</it>. The <it>10</it> closest
-concepts shall be returned:
-<pre><code>[GET] /rest/closest-concepts/<var>wiktionary</var>/<var>10</var>/<var>sleep</var></code></pre>
-When fired, the server will return the answer in JSON format:
-<br/>
-<samp>
-    {"result":[{"concept":"http://kaiko.getalp.org/dbnary/eng/sleep","score":1},{"concept":"http://kaiko.getalp.org/dbnary/eng/shut-eye","score":0.8186817477549158},
-    {"concept":"http://kaiko.getalp.org/dbnary/eng/slumber","score":0.7709401272832646},{"concept":"http://kaiko.getalp.org/dbnary/eng/saw_wood","score":0.7634760538108614},
-    {"concept":"http://kaiko.getalp.org/dbnary/eng/saw_logs","score":0.7551617987366845},{"concept":"http://kaiko.getalp.org/dbnary/eng/catnap","score":0.7313411291570826},
-    {"concept":"http://kaiko.getalp.org/dbnary/eng/snooze","score":0.7308778501775014},{"concept":"http://kaiko.getalp.org/dbnary/eng/rheum","score":0.6954013149849927},
-    {"concept":"http://kaiko.getalp.org/dbnary/eng/rest","score":0.6923312186663374},{"concept":"http://kaiko.getalp.org/dbnary/eng/doze","score":0.691527738756718}]}
-</samp>
-<br/>
-</p>
 
 
 <h2>Get Vector</h2>
@@ -104,4 +73,38 @@ For the <it>wordnet</it> data set, multiple vectors might be returned depending 
 </samp>
 </p>
 <br/>
+
+<h2>N Closest Concepts</h2>
+<p>This service is also used for the Web UI demo.<br/>General structure of the REST call:</p>
+<pre><code>[GET] /rest/closest-concepts/<var>&lt;data_set&gt;</var>/<var>&lt;top_n&gt;</var>/<var>&lt;concept_name&gt;</var></code></pre>
+<h3>Parameters</h3>
+<p>
+<ul>
+    <li><code>data_set</code><br/>The data set you want to query. Available values are:</li>
+    <ul>
+        <li><code>wordnet</code></li>
+        <li><code>wiktionary</code></li>
+        <li><code>babelnet</code></li>
+        <li><code>alod</code></li>
+    </ul>
+    <li><code>top_n</code><br/>The number of closets concepts that shall be retrieved.</li>
+    <li><code>concept_name</code><br/>The name of the concept you want to query for. If the concept cannot be found, the response will be empty.</li>
+</ul>
+<h3>Example</h3>
+In the following, an example is given for the concept <it>sleep</it> on data set <it>wiktionary</it>. The <it>10</it> closest
+concepts shall be returned:
+<pre><code>[GET] /rest/closest-concepts/<var>wiktionary</var>/<var>10</var>/<var>sleep</var></code></pre>
+When fired, the server will return the answer in JSON format:
+<br/>
+<samp>
+    {"result":[{"concept":"http://kaiko.getalp.org/dbnary/eng/sleep","score":1},{"concept":"http://kaiko.getalp.org/dbnary/eng/shut-eye","score":0.8186817477549158},
+    {"concept":"http://kaiko.getalp.org/dbnary/eng/slumber","score":0.7709401272832646},{"concept":"http://kaiko.getalp.org/dbnary/eng/saw_wood","score":0.7634760538108614},
+    {"concept":"http://kaiko.getalp.org/dbnary/eng/saw_logs","score":0.7551617987366845},{"concept":"http://kaiko.getalp.org/dbnary/eng/catnap","score":0.7313411291570826},
+    {"concept":"http://kaiko.getalp.org/dbnary/eng/snooze","score":0.7308778501775014},{"concept":"http://kaiko.getalp.org/dbnary/eng/rheum","score":0.6954013149849927},
+    {"concept":"http://kaiko.getalp.org/dbnary/eng/rest","score":0.6923312186663374},{"concept":"http://kaiko.getalp.org/dbnary/eng/doze","score":0.691527738756718}]}
+</samp>
+<br/>
+</p>
+<br/>
+<p>Are you missing something or did you spot an error? Do not hesitate to <a href="./about.html">contact us</a>.</p>
 {% endblock %}

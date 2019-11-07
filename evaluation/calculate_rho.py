@@ -1,10 +1,14 @@
+import operator
 from collections import namedtuple
 
 from alod.alod_query_service import AlodQueryService
 from scipy.stats import spearmanr
+from collections import OrderedDict
+from math import factorial
 
 from babelnet.babelnet_query_service import BabelNetQueryService
 from dbnary.dbnary_query_service import DbnaryQueryService
+from dbpedia.dbpedia_query_service import DBpediaQueryService
 from wordnet.wordnet_query_service import WordnetQueryService
 
 
@@ -40,6 +44,7 @@ class Evaluator:
         simlex = self.__load_simlex(path_to_simlex)
         service_similarity = []
         simlex_similarity = []
+        number_of_entries_not_found = 0
         for entry in simlex:
             if nouns_only and entry[2] != "N":
                 continue
@@ -48,12 +53,14 @@ class Evaluator:
             else:
                 similarity = service.get_similarity(entry[0], entry[1])
             if similarity is None:
+                number_of_entries_not_found += 1
                 print("ERROR: Not found: " + entry[0] + "   " + entry[1])
                 service_similarity.append(0)
                 simlex_similarity.append(entry[3])
             else:
                 service_similarity.append(similarity)
                 simlex_similarity.append(entry[3])
+        print("Number of entries not found: " + str(number_of_entries_not_found))
         return spearmanr(service_similarity, simlex_similarity)
 
 
@@ -153,22 +160,97 @@ class Evaluator:
                 result.append((intermediate_result[0:4]))
             return result
 
+
+
+    @staticmethod
+    def sum_scores(list_of_borda_scores):
+        GsBordaEntryResult = namedtuple('Entry', 'w1 w2 score')
+        final_score_card = []
+        for score_list in list_of_borda_scores:
+            for entry in score_list:
+                score_card_entry = Evaluator.get_entry_of_relative_score_for_borda(final_score_card, entry.w1, entry.w2)
+                if score_card_entry != None:
+                    final_score_card.remove(score_card_entry)
+                    new_entry = GsBordaEntryResult(entry.w1, entry.w2, score_card_entry.score + entry.score)
+                    final_score_card.append(new_entry)
+                else:
+                    final_score_card.append(entry)
+        return final_score_card
+
+
+
+    @staticmethod
+    def get_relative_score_for_borda(score_map):
+        # remove 0 values (exact 0 values are not found by system)
+        descending_list = []
+        for entry in score_map:
+            if entry.sim != 0:
+                descending_list.append(entry)
+
+        print(descending_list)
+        descending_list.sort(key=lambda e : e.sim, reverse=True)
+        print(descending_list)
+
+        GsBordaEntryResult = namedtuple('Entry', 'w1 w2 score')
+        result = []
+        position = 0
+        length = len(descending_list)
+        normalization_score = factorial(length)
+        for entry in descending_list:
+            result.append(GsBordaEntryResult(entry.w1, entry.w2, (length - position) / normalization_score))
+            position += 1
+        return result
+
+
+    @staticmethod
+    def get_entry_of_relative_score_for_borda(relative_score_for_borda, w1, w2):
+        for entry in relative_score_for_borda:
+            if entry.w1 == w1 and entry.w2 == w2:
+                return entry
+        return None
+
 def main():
     evaluator = Evaluator()
-    # alod_service = AlodQueryService(vector_file="./alod/alod_500_4/sg200_alod_500_4")
 
-    # dbnary_service = DbnaryQueryService(entity_file="../dbnary/dbnary_500_4_df_pages/dbnary_entities.txt",
-    #                                   model_file="../dbnary/dbnary_500_4_df_pages/sg200_dbnary_pages_500_4_df")
+    wordSim_353_similarity_gs = r"/work/jportisc/EmbeddingServer/gold_standards/wordsim_similarity_goldstandard.txt"
+    simlex_gs = r"/work/jportisc/EmbeddingServer/gold_standards/SimLex-999.txt"
+    men_gs = r"/work/jportisc/EmbeddingServer/gold_standards/MEN_dataset_lemma_form_full.txt"
 
-    wordnet_service = WordnetQueryService(entity_file='../wordnet/wordnet_500_8/wordnet_entities.txt',
-                                           model_file='../sg200_wordnet_500_8_df_with_strings')
+    #babelnet_service = BabelNetQueryService('entity_file', model_file='', vector_file='')
+    #print("WordSim-353 (BabelNet): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, babelnet_service)))
+    #print("SimLex-999 [all] (BabelNet): " + str(evaluator.simlex_spearman_rho(simlex_gs, babelnet_service, nouns_only=False, use_pos=True)))
+    #print("SimLex-999 [nouns] (BabelNet): " + str(evaluator.simlex_spearman_rho(simlex_gs, babelnet_service, nouns_only=True, use_pos=False)))
+    #print("MEN [all] (BabelNet): " + str(evaluator.men_spearman_rho(men_gs, babelnet_service, nouns_only=False, use_pos=True)))
+    #print("MEN [nouns] (BabelNet): " + str(evaluator.men_spearman_rho(men_gs, babelnet_service, nouns_only=True, use_pos=False)))
 
-    # babelnet_service = BabelNetQueryService('entity_file', model_file='', vector_file='')
+    dbpedia_service = DBpediaQueryService(entity_file='/work/jportisc/Walk_Generation_dbpedia_100_8_df/cache/dbpedia_entities.txt', model_file='/work/jportisc/models/iteration_2/dbpedia/100_8/dbpedia_100_8_df')
+    print("WordSim-353 (DBpedia): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, dbpedia_service)))
+    print("SimLex-999 [all] (DBpedia): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbpedia_service, nouns_only=False, use_pos=False)))
+    print("SimLex-999 [nouns] (DBpedia): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbpedia_service, nouns_only=True, use_pos=False)))
+    print("MEN [all] (DBpedia): " + str(evaluator.men_spearman_rho(men_gs, dbpedia_service, nouns_only=False, use_pos=False)))
+    print("MEN [nouns] (DBpedia): " + str(evaluator.men_spearman_rho(men_gs, dbpedia_service, nouns_only=True, use_pos=False)))
 
-    print("WordSim-353: " + str(evaluator.wordsim_spearman_rho(r"../gold_standards/wordsim_similarity_goldstandard.txt", wordnet_service)))
-    print("SimLex-999: " + str(evaluator.simlex_spearman_rho(r"../gold_standards/SimLex-999.txt", wordnet_service, nouns_only=False, use_pos=True)))
-    print("MEN: " + str(evaluator.men_spearman_rho(r"../gold_standards/MEN_dataset_lemma_form_full.txt", wordnet_service,
-                                     nouns_only=False, use_pos=True)))
+    dbnary_service = DbnaryQueryService(entity_file="/work/jportisc/EmbeddingServer/dbnary/dbnary_entities.txt", model_file="/work/jportisc/models/iteration_2/wiktionary/without_vocab_loss/sg200_dbnary_500_8_df_all")
+    print("WordSim-353 (DBnary): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, dbnary_service)))
+    print("SimLex-999 [all] (DBnary): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbnary_service, nouns_only=False, use_pos=False)))
+    print("SimLex-999 [nouns] (DBnary): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbnary_service, nouns_only=True, use_pos=False)))
+    print("MEN [all] (DBnary): " + str(evaluator.men_spearman_rho(men_gs, dbnary_service, nouns_only=False, use_pos=False)))
+    print("MEN [nouns] (DBnary): " + str(evaluator.men_spearman_rho(men_gs, dbnary_service, nouns_only=True, use_pos=False)))
+
+    alod_service = AlodQueryService(model_file="/work/jportisc/models/iteration_2/alod/100_4_df/alodc_df_100_4")
+    print("WordSim-353 (ALOD): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, alod_service)))
+    print("SimLex-999 [all] (ALOD): " + str(evaluator.simlex_spearman_rho(simlex_gs, alod_service, nouns_only=False, use_pos=False)))
+    print("SimLex-999 [nouns] (ALOD): " + str(evaluator.simlex_spearman_rho(simlex_gs, alod_service, nouns_only=True, use_pos=False)))
+    print("MEN [all] (ALOD): " + str(evaluator.men_spearman_rho(men_gs, alod_service, nouns_only=False, use_pos=False)))
+    print("MEN [nouns] (ALOD): " + str(evaluator.men_spearman_rho(men_gs, alod_service, nouns_only=True, use_pos=False)))
+
+    wordnet_service = WordnetQueryService(entity_file='/work/jportisc/EmbeddingServer/wordnet/wordnet_entities.txt', model_file='/work/jportisc/models/iteration_2/wordnet/without_strings/sg200_wordnet_500_8_df_without_strings')
+    print("WordSim-353 (WordNet): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, wordnet_service)))
+    print("SimLex-999 [all] (WordNet): " + str(evaluator.simlex_spearman_rho(simlex_gs, wordnet_service, nouns_only=False, use_pos=True)))
+    print("SimLex-999 [nouns] (WordNet): " + str(evaluator.simlex_spearman_rho(simlex_gs, wordnet_service, nouns_only=True, use_pos=True)))
+    print("MEN [all] (WordNet): " + str(evaluator.men_spearman_rho(men_gs, wordnet_service, nouns_only=False, use_pos=True)))
+    print("MEN [nouns] (WordNet): " + str(evaluator.men_spearman_rho(men_gs, wordnet_service, nouns_only=True, use_pos=True)))
+
 
 if __name__ == "__main__":
     main()
