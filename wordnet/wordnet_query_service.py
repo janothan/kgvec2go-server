@@ -1,14 +1,20 @@
 import gensim
 import re
 from collections import namedtuple
+from gensim.models import KeyedVectors
 
 
 class WordnetQueryService:
 
-    def __init__(self, entity_file, model_file):
+    def __init__(self, entity_file, model_file='', vector_file='', is_reduced_vector_file=False):
+        if vector_file == '':
+            self.model = gensim.models.Word2Vec.load(model_file)
+            self.vectors = self.model.wv
+        else:
+            self.vectors = KeyedVectors.load(vector_file, mmap='r')
         self.all_lemmas = self.__read_lemmas(entity_file)
-        self.model = gensim.models.Word2Vec.load(model_file)
         self.term_mapping = self.__map_terms(self.all_lemmas)
+        self.is_reduced_vector_file = is_reduced_vector_file
 
     @staticmethod
     def transform_string(string_to_be_transformed):
@@ -44,22 +50,33 @@ class WordnetQueryService:
 
     def __read_lemmas(self, path_to_lemma_file):
         result = []
+        number_of_vocab_errors = 0
         with open(path_to_lemma_file, errors='ignore') as lemma_file:
             for lemma in lemma_file:
-                result.append(lemma.replace("\n", ""))
+                lemma = lemma.replace("\n", "")
+                if lemma in self.vectors.vocab:
+                    result.append(lemma)
+                else:
+                    print("The following lemma was not found in vocab: " + lemma)
+                    number_of_vocab_errors += 1
         print("WordNet lemmas read.")
+        print("Number of Vocab errors: " + str(number_of_vocab_errors))
         return result
 
     def find_closest_lemmas_given_key(self, key, top):
         if key not in self.model.wv.vocab:
             return None
-        ResultEntry = namedtuple('ResultEntry', 'concept similarity')
-        result_list = []
-        for concept in self.all_lemmas:
-            result_list.append(ResultEntry(concept, self.model.wv.similarity(key, concept)))
-        result_list.sort(key=self.__take_second, reverse=True)
-        result_list = result_list[:int(top)]
         result = '{\n"result": [\n'
+        if self.is_reduced_vector_file:
+            result_list = self.vectors.most_similar(positive=key, topn=top)
+        else:
+            ResultEntry = namedtuple('ResultEntry', 'concept similarity')
+            result_list = []
+            for concept in self.all_lemmas:
+                result_list.append(ResultEntry(concept, self.vectors.similarity(key, concept)))
+            result_list.sort(key=self.__take_second, reverse=True)
+            result_list = result_list[:int(top)]
+
         is_first = True
         for entry in result_list:
             if is_first:
@@ -86,7 +103,7 @@ class WordnetQueryService:
             for concept in self.all_lemmas:
                 temp_result_list = []
                 for uri in self.term_mapping[lookup_key]:
-                    temp_result_list.append((concept, self.model.wv.similarity(uri, concept)))
+                    temp_result_list.append((concept, self.vectors.similarity(uri, concept)))
                 temp_result_list.sort(key=self.__take_second, reverse=True)
                 result_list.append(temp_result_list[0])
             result_list.sort(key=self.__take_second, reverse=True)
@@ -114,7 +131,7 @@ class WordnetQueryService:
         is_first = True
         if lookup_key in self.term_mapping:
             for key in self.term_mapping[lookup_key]:
-                vector = self.model.wv.get_vector(key)
+                vector = self.vectors.get_vector(key)
                 if is_first:
                     is_first = False
                     result += '{"uri": ' + '"' + key + '",\n"vector": ' + self.__to_json_arry(vector) + '}'
@@ -158,7 +175,7 @@ class WordnetQueryService:
             # always pick the noun if there are multiple matches
             vector_1 = self.__pick_pos_vector(self.term_mapping[lookup_key_1], pos=pos_1)
             vector_2 = self.__pick_pos_vector(self.term_mapping[lookup_key_1], pos=pos_2)
-            return self.model.wv.similarity(vector_1, vector_2)
+            return self.vectors.similarity(vector_1, vector_2)
         else:
             return None
 

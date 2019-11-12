@@ -32,16 +32,46 @@ def show_api_page():
 def show_about_page():
     return render_template("about.html")
 
+@app.route("/robots.txt")
+def robots_txt():
+    return render_template("robots.txt")
 
-dbnary_service = DbnaryQueryService(entity_file="./dbnary/dbnary_500_8_pages/dbnary_entities.txt",
-                             model_file="./dbnary/dbnary_500_8_pages/sg200_dbnary_500_8_pages")
 
-wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
-                                         model_file='./wordnet/wordnet_500_8/sg200_wordnet_500_8')
+# DBpedia
+#path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
+#path_to_dbpedia_entities = "/disk/dbpedia/dbpedia_entities.txt"
 
-alod_service = AlodQueryService(model_file="./alod/alod_500_4/sg200_alod_500_4")
+path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
+path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
+dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors)
 
-dbpedia_service = DBpediaQueryService(entity_file="", model_file="")
+# ALOD
+path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
+#alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
+alod_service = 0
+
+# DBnary / Wiktionary
+path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
+path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
+#dbnary_service = DbnaryQueryService(entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors)
+dbnary_service = 0
+
+# WordNet
+#path_to_wordnet_vectors = "/disk/wordnet/sg200_wordnet_500_8_df_mc1_it3_vectors.kv"
+path_to_wordnet_vectors = "/disk/wordnet/sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv"
+
+path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
+# wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, ector_file=path_to_wordnet_vectors, is_reduced_vector_file=True)
+wordnet_service = 0
+
+
+#wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
+#                                         model_file='./wordnet/wordnet_500_8/sg200_wordnet_500_8')
+#
+#
+
+
+
 
 
 @app.route('/rest/closest-concepts/<data_set>/<top_n>/<concept_name>', methods=['GET'])
@@ -133,4 +163,4 @@ def get_similarity(data_set, concept_name_1, concept_name_2):
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(host='0.0.0.0', debug=False)

@@ -60,6 +60,8 @@ $('document').ready( function(){
                 service = 'babelnet'
             } else if ( $("#wiktionary-nav").hasClass('active')) {
                 service = 'wiktionary'
+            } else if ( $("#dbpedia-nav").hasClass('active')) {
+                service = 'dbpedia'
             }
 
             if(service == '') {
@@ -67,7 +69,7 @@ $('document').ready( function(){
                 return
             }
 
-            const request_uri = 'http://127.0.0.1:5000/rest/closest-concepts/' + service + '/10/' + encodeURI(search_term)
+            const request_uri = '/rest/closest-concepts/' + service + '/10/' + encodeURI(search_term)
             console.log("Request GET: " + request_uri)
             const response = await fetch(request_uri)
             const table = await response.json();

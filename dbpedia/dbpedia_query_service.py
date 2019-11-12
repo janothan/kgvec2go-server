@@ -6,26 +6,41 @@ from collections import namedtuple
 class DBpediaQueryService:
 
     def __init__(self, entity_file, model_file='', vector_file=''):
-        # reading the instances
-        self.all_lemmas = self.__read_lemmas(entity_file)
-
-        # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
-        self.term_mapping = self.__map_terms(self.all_lemmas)
-
         if vector_file != '':
-            KeyedVectors.load(vector_file, mmap='r')
+            self.vectors = KeyedVectors.load(vector_file, mmap=None)
         elif model_file != '':
             self.model = gensim.models.Word2Vec.load(model_file)
             self.vectors = self.model.wv
         else:
             print("ERROR - a model or vector file needs to be specified.")
 
+        # reading the instances
+        self.all_lemmas = self.__read_lemmas(entity_file)
+
+        # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
+        self.term_mapping = self.__map_terms(self.all_lemmas)
+
+        print("Examples from DBpedia vocabulary")
+        iteration = 0
+        for word in self.vectors.vocab:
+            print(word)
+            iteration += 1
+            if iteration > 100:
+                break
+
     def __read_lemmas(self, entity_file_path):
         result = []
+        number_of_key_errors = 0
         with open(entity_file_path, errors='ignore') as lemma_file:
             for lemma in lemma_file:
-                result.append(lemma.replace("\n", "").replace("\r", ""))
+                lemma = lemma.replace("\n", "")
+                if lemma not in self.vectors.vocab:
+                    print("Could not find DBpedia concept: " + lemma)
+                    number_of_key_errors += 1
+                else:
+                    result.append(lemma.replace("\n", "").replace("\r", ""))
         print("DBpedia lemmas read.")
+        print("Number of key errors " + str(number_of_key_errors))
         return result
 
     def __map_terms(self, all_lemmas):
@@ -55,7 +70,6 @@ class DBpediaQueryService:
         string_to_be_transformed = string_to_be_transformed.replace("-", "_")
         string_to_be_transformed = string_to_be_transformed.replace(".", "")
         return string_to_be_transformed
-
 
     def get_similarity(self, concept_1, concept_2):
         """Calculate the similarity between the two given concepts.
@@ -170,12 +184,12 @@ class DBpediaQueryService:
         return result + "]"
 
     def find_closest_lemmas_given_key(self, key, top):
-        if key not in self.model.wv.vocab:
+        if key not in self.vectors.vocab:
             return None
         result_list = []
         ResultEntry = namedtuple('ResultEntry', 'concept similarity')
         for concept in self.all_lemmas:
-            result_list.append(ResultEntry(concept, self.model.wv.similarity(key, concept)))
+            result_list.append(ResultEntry(concept, self.vectors.similarity(key, concept)))
         result_list.sort(key=self.__take_second, reverse=True)
         result_list = result_list[:int(top)]
         result = '{\n"result": [\n'

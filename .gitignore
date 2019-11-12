@@ -161,3 +161,4 @@ test_model_vectors_reduced.kv
 test.py
 evaluation_tmp.txt
 __pycache__
+sg200_dbnary_100_8_df_mc1_it3_reduced_vectors.kv

@@ -17,7 +17,7 @@
   display: inline-block;
   padding: 8px;
   color: white;
-  background-color: #000;
+  background-color: #007bff;
   text-align: center;
   cursor: pointer;
   width: 100%;
@@ -27,7 +27,7 @@
 .card-link  {
   text-decoration: none;
   font-size: 22px;
-  color: black;
+  color: #007bff;
 }
 
 .contact-button:hover, .card-link:hover {
@@ -35,5 +35,5 @@
 }
 
 .contact-icon {
-    color: black;
+    color: #007bff;
 }

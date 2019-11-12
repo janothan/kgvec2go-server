@@ -9,6 +9,19 @@ class DbnaryQueryService:
     """
 
     def __init__(self, entity_file='', model_file='', vector_file='', is_reduced_vector_file=False):
+        """
+
+        Parameters
+        ----------
+        entity_file
+            File to the entities.
+        model_file
+            The model file. If used, the vector_file is not required.
+        vector_file
+            The vector file. If used, the model_file is not required.
+        is_reduced_vector_file
+            True if unnecessary have already been removed from the vector space (using vector_shrinker.py).
+        """
         if vector_file == '':
             self.model = gensim.models.Word2Vec.load(model_file)
             self.vectors = self.model.wv
@@ -51,25 +64,38 @@ class DbnaryQueryService:
             return self.vectors.vocab
         else:
             result = []
+            number_of_vocab_errors = 0
             with open(path_to_lemma_file, errors='ignore') as lemma_file:
                 for lemma in lemma_file:
                     lemma = lemma.replace("\n", "").replace("\r", "")
-                    result.append(lemma)
+                    if lemma not in self.vectors.vocab:
+                        print("The follwing lemma was not found in the vocabulary: " + lemma)
+                        number_of_vocab_errors += 1
+                    else:
+                        result.append(lemma)
                     #if lemma not in self.vectors.vocab:
                     #    print(lemma + " not in vocabulary.")
             print("Dbnary lemmas read.")
+            print("Number of vocabulary errors: " + str(number_of_vocab_errors))
             return result
 
     def find_closest_lemmas_given_key(self, key, top):
-        if key not in self.self.vectors.vocab:
+        if key not in self.vectors.vocab:
             return None
         if self.is_reduced_vector_file:
             result_list = self.vectors.most_similar(positive=key, topn=top)
         else:
             result_list = []
             ResultEntry = namedtuple('ResultEntry', 'concept similarity')
+            not_found_error = 0
             for concept in self.all_lemmas:
-                result_list.append(ResultEntry(concept, self.self.vectors.similarity(key, concept)))
+                try:
+                    similarity = self.vectors.similarity(key, concept)
+                    result_list.append(ResultEntry(concept, similarity))
+                except KeyError:
+                    print("Word " + concept + " not found. Continue...")
+                    not_found_error += 1
+            print("Not found keys: " + str(not_found_error))
             result_list.sort(key=self.__take_second, reverse=True)
             result_list = result_list[:int(top)]
         result = '{\n"result": [\n'
