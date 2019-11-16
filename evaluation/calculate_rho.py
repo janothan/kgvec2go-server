@@ -25,6 +25,24 @@ class Evaluator:
                 result.append(line.split("\t"))
             return result
 
+    def wordsim_spearman_rho_borda(self, path_to_wordsim, *services):
+        wordsim = self.load_wordsim(path_to_wordsim)
+        service_similarity = []
+        wordsim_similarity = []
+        for entry in wordsim:
+            similarity = 0
+            for service in services:
+                service_similarity = service.get_similarity(entry[0], entry[1])
+
+                if service_similarity is None:
+                    print("ERROR: Not found [" + str(service) +  "]: " + entry[0] + "   " + entry[1])
+                else:
+                    similarity += service_similarity
+            service_similarity.append(similarity)
+            wordsim_similarity.append(entry[2])
+        return spearmanr(service_similarity, wordsim_similarity)
+
+
     def wordsim_spearman_rho(self, path_to_wordsim, service):
         wordsim = self.load_wordsim(path_to_wordsim)
         service_similarity = []

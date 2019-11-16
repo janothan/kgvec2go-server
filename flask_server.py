@@ -46,8 +46,9 @@ if on_local:
     print("Using local environment.")
     path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
     path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
-    #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors)
-    dbpedia_service = 0
+    path_to_dbpedia_redirects = "/Users/janportisch/Documents/Research/DBpedia/redirects_en.ttl"
+    dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
+    #dbpedia_service = 0
     alod_service = 0
     wordnet_service = 0
     dbnary_service = 0
@@ -149,16 +150,16 @@ def get_similarity(data_set, concept_name_1, concept_name_2):
     if data_set not in data_sets:
         return None
     if data_set == 'wiktionary':
-        #print("Wiktionary get-vector query fired.")
-        #result = dbnary_service.get_vector(concept_name)
-        #print(result)
-        #return result
+        print("Wiktionary get-vector query fired.")
+        result = dbnary_service.get_similarity_json(concept_name_1, concept_name_2)
+        print(result)
+        return result
         return None
     elif data_set == 'wordnet':
-       #print("Wordnet get-vector query fired.")
-       #result = wordnet_service.get_vector(concept_name)
-       #print(result)
-       #return result
+       print("Wordnet get-vector query fired.")
+       result = wordnet_service.get_similarity_json(concept_name_1, concept_name_2)
+       print(result)
+       return result
        return None
     elif data_set == 'alod':
         print("ALOD Classic get-similarity query fired.")
