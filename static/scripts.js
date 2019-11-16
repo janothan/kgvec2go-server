@@ -28,11 +28,11 @@ $('document').ready( function(){
 
     $('#alod-nav').click(
         function(){
-            $('#alod-nav').removeClass('active');
+            $('#wiktionary-nav').removeClass('active');
             $('#wordnet-nav').removeClass('active');
             $('#babelnet-nav').removeClass('active');
-            $('#alod-nav').addClass('active');
             $('#dbpedia-nav').removeClass('active');
+            $('#alod-nav').addClass('active');
     });
 
     $('#dbpedia-nav').click(

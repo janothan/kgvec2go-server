@@ -7,6 +7,8 @@ from wordnet.wordnet_query_service import WordnetQueryService
 
 app = Flask(__name__)
 
+print("Initiating Server...")
+
 @app.route('/index.html')
 @app.route("/")
 def show_start_page():
@@ -37,32 +39,39 @@ def robots_txt():
     return render_template("robots.txt")
 
 
-# DBpedia
-#path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
-#path_to_dbpedia_entities = "/disk/dbpedia/dbpedia_entities.txt"
+on_local = True
 
-path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
-path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
-dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors)
 
-# ALOD
-path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
-#alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
-alod_service = 0
+if on_local:
+    print("Using local environment.")
+    path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
+    path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
+    #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors)
+    dbpedia_service = 0
+    alod_service = 0
+    wordnet_service = 0
+    dbnary_service = 0
+else:
+    print("Using server environment.")
 
-# DBnary / Wiktionary
-path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
-path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
-#dbnary_service = DbnaryQueryService(entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors)
-dbnary_service = 0
+    # DBpedia linux
+    #path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
+    #path_to_dbpedia_entities = "/disk/dbpedia/dbpedia_entities.txt"
 
-# WordNet
-#path_to_wordnet_vectors = "/disk/wordnet/sg200_wordnet_500_8_df_mc1_it3_vectors.kv"
-path_to_wordnet_vectors = "/disk/wordnet/sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv"
+    # ALOD
+    path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
+    alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
 
-path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
-# wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, ector_file=path_to_wordnet_vectors, is_reduced_vector_file=True)
-wordnet_service = 0
+    # DBnary / Wiktionary
+    path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
+    path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
+    dbnary_service = DbnaryQueryService(entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors)
+
+    # WordNet
+    #path_to_wordnet_vectors = "/disk/wordnet/sg200_wordnet_500_8_df_mc1_it3_vectors.kv"
+    path_to_wordnet_vectors = "/disk/wordnet/sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv"
+    path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
+    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors, is_reduced_vector_file=True)
 
 
 #wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
@@ -70,6 +79,7 @@ wordnet_service = 0
 #
 #
 
+print("Server Initiated.")
 
 
 

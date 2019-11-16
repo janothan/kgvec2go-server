@@ -1,16 +1,22 @@
 import gensim
 from gensim.models import KeyedVectors
+import logging
+logging.basicConfig(handlers=[logging.FileHandler(__file__ + '.log', 'w', 'utf-8')], format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
 
+vectors = KeyedVectors.load("/work/jportisc/models/iteration_4/dbpedia/sg200_dbpedia_100_8_df_mc1_updated_vectors.kv")
 
-vectors = KeyedVectors.load("/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv")
-
+#print("Contains 'dbr:Landesliga_Suedbaden': " + str("dbr:Landesliga_Südbaden" in vectors.vocab))
+#print("Contains 'dbr:Landesliga_S??dbaden': " + str("dbr:Landesliga_S??dbaden" in vectors.vocab))
+#print("Contains 'dbr:Landesliga_Südbaden' (encoded): ".encode("utf-8") + str("dbr:Landesliga_Südbaden".encode("utf-8") in vectors.vocab))
+#print("Contains 'dbr:Landesliga_Südbaden' (encoded): ".encode("utf-8") + str(u"dbr:Landesliga_Südbaden" in vectors.vocab))
+print("vectors read")
 limit = 0
+
+
 for word in vectors.vocab:
-    if "dbr:" in word:
-        print(word)
-        limit += 1
-        if limit > 100:
-            break
+    if "Landesliga" in word:
+        logging.info(word)
+
 
 #model = gensim.models.Word2Vec.load("/work/jportisc/Training_BabelNet_100_8_df/sg200_babelnet_100_8_df_mc1_updated")
 #vectors = model.wv

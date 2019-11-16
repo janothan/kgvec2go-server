@@ -2,13 +2,23 @@
 {% block about_active %}active{% endblock %}
 {% block header_1 %}About{% endblock %}
 {% block content_1 %}
+
+<h2>Citation</h2>
 <p>
-    When using this work, please cite us: TODO CITATION<br/><br/>
-    Contact: <br/>
-    Jan Portisch, University of Mannheim (<a
-        href="mailto:jan@informatik.uni-mannheim.de">jan@informatik.uni-mannheim.de</a>)<br/>
-    Heiko Paulheim, University of Mannheim (<a href="mailto:heiko@informatik.uni-mannheim.de">jan@informatik.uni-mannheim.de</a>)
-</p><br/>
+    When using this work, please cite us:<br/>
+<pre>
+    <code>Portisch, Jan; Hladik, Michael; Paulheim, Heiko. KGvec2go - RDF2Vec Embedded Knowledge Graphs. LREC 2020.</code>
+</pre>
+
+<h2>Contact</h2>
+<ul>
+    <li>Jan Portisch, University of Mannheim / SAP SE (<a href="mailto:jan@informatik.uni-mannheim.de">jan@informatik.uni-mannheim.de</a>)
+    </li>
+    <li>Michael Hladik, SAP SE (<a href="mailto:michal.hladik@sap.com">michael.hladik@sap.com</a>)</li>
+    <li>Heiko Paulheim, University of Mannheim (<a href="mailto:heiko@informatik.uni-mannheim.de">jan@informatik.uni-mannheim.de</a>)
+    </li>
+</ul>
+</p>
 
 
 <div class="container">
@@ -18,16 +28,38 @@
                 <img alt="Picture of Jan" src="static/jan_quadratic.png" style="width:100%">
                 <h1>Jan Portisch</h1>
                 <!--<p class="title">PhD Student</p>-->
-                <p>University of Mannheim</p>
+                <p>University of Mannheim / SAP SE</p>
                 <p>
-                    <a class="card-link" href="#"><i class="fa fa-dribbble contact-icon"></i></a>
-                    <a class="card-link" href="#"><i class="fa fa-twitter contact-icon"></i></a>
-                    <a class="card-link" href="#"><i class="fa fa-linkedin contact-icon"></i></a>
-                    <a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>
+                    <!--<a class="card-link" href="#"><i class="fa fa-dribbble contact-icon"></i></a>-->
+                    <a class="card-link" href="https://twitter.com/JanPortisch"><i
+                            class="fa fa-twitter contact-icon"></i></a>
+                    <a class="card-link" href="https://www.linkedin.com/in/jan-portisch/"><i
+                            class="fa fa-linkedin contact-icon"></i></a>
+                    <!--<a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>-->
                 </p>
-
-                <button class="contact-button">Contact</button>
-
+                <form action="mailto:jan@informatik.uni-mannheim.de" method="get" target="_blank">
+                    <button class="contact-button">Contact</button>
+                </form>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <img alt="Picture of Michael" src="static/michael_quadratic.jpg" style="width:100%">
+                <h1>Michael Hladik</h1>
+                <!--<p class="title"></p>-->
+                <p>SAP SE</p>
+                <p>
+                    <!--<a class="card-link" href=""><i
+                            class="fa fa-dribbble contact-icon"></i></a>-->
+                    <a class="card-link" href="https://twitter.com/michaelhladik"><i
+                            class="fa fa-twitter contact-icon"></i></a>
+                    <a class="card-link" href="https://www.linkedin.com/in/michaelhladik/"><i
+                            class="fa fa-linkedin contact-icon"></i></a>
+                    <!--<a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>-->
+                </p>
+                <form action="mailto:heiko@informatik.uni-mannheim.de" method="get" target="_blank">
+                    <button class="contact-button" type="submit">Contact</button>
+                </form>
             </div>
         </div>
         <div class="col">
@@ -37,14 +69,17 @@
                 <!--<p class="title"></p>-->
                 <p>University of Mannheim</p>
                 <p>
-                    <a class="card-link" href="#"><i class="fa fa-dribbble contact-icon"></i></a>
-                    <a class="card-link" href="#"><i class="fa fa-twitter contact-icon"></i></a>
-                    <a class="card-link" href="#"><i class="fa fa-linkedin contact-icon"></i></a>
-                    <a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>
+                    <a class="card-link" href="http://www.heikopaulheim.com/"><i
+                            class="fa fa-dribbble contact-icon"></i></a>
+                    <a class="card-link" href="https://twitter.com/heikopaulheim"><i
+                            class="fa fa-twitter contact-icon"></i></a>
+                    <a class="card-link" href="https://www.linkedin.com/in/heikopaulheim/"><i
+                            class="fa fa-linkedin contact-icon"></i></a>
+                    <!--<a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>-->
                 </p>
-
-                <button class="contact-button">Contact</button>
-
+                <form action="mailto:heiko@informatik.uni-mannheim.de" method="get" target="_blank">
+                    <button class="contact-button" type="submit">Contact</button>
+                </form>
             </div>
         </div>
     </div>

@@ -101,13 +101,13 @@ def save_vector_file(path_to_model, path_to_vector_file):
 
 
 def main():
-    old_vector_file_path = './sg200_dbnary_100_8_df_mc1_it3_vectors.kv'
-    concepts_to_keep_file_path = '/work/jportisc/EmbeddingServer/dbnary/dbnary_entities.txt'
-    file_to_write_file_path = './sg200_dbnary_100_8_df_mc1_it3_reduced_vectors.kv'
+    old_vector_file_path = './sg200_dbpedia_100_8_df_mc1_updated_vectors.kv'
+    concepts_to_keep_file_path = '/work/jportisc/Walk_Generation_dbpedia_100_8_df/cache/dbpedia_entities.txt'
+    file_to_write_file_path = './sg200_dbpedia_100_8_df_mc1_updated__reduced_vectors.kv'
 
     # optional
-    #model_file_path = './sg200_dbnary_100_8_df_mc1_it3'
-    #save_vector_file(model_file_path, old_vector_file_path)
+    model_file_path = './sg200_dbpedia_100_8_df_mc1_updated'
+    save_vector_file(model_file_path, old_vector_file_path)
 
     shrink_vectors_new(vectors=KeyedVectors.load(old_vector_file_path, mmap='r'), path_to_concept_file=concepts_to_keep_file_path, file_to_write=file_to_write_file_path)
     #test("./test_model_vectors.kv")

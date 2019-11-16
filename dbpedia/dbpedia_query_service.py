@@ -23,7 +23,7 @@ class DBpediaQueryService:
         print("Examples from DBpedia vocabulary")
         iteration = 0
         for word in self.vectors.vocab:
-            print(word)
+            print(word.encode('utf-8'))
             iteration += 1
             if iteration > 100:
                 break
@@ -154,6 +154,7 @@ class DBpediaQueryService:
     def find_closest_lemmas(self, lemma, top):
         print("Closest lemma query for " + lemma + " received.")
         lookup_key = self.__transform_string(lemma)
+        print("Transformed to " + lookup_key)
         if lookup_key in self.term_mapping:
             return self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
         else:
