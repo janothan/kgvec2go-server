@@ -27,20 +27,20 @@ class Evaluator:
 
     def wordsim_spearman_rho_borda(self, path_to_wordsim, *services):
         wordsim = self.load_wordsim(path_to_wordsim)
-        service_similarity = []
+        borda_similarity = []
         wordsim_similarity = []
         for entry in wordsim:
             similarity = 0
             for service in services:
                 service_similarity = service.get_similarity(entry[0], entry[1])
-
+                print("Similarity of " + str(service) + " on (" + entry[0] + ", " + entry[1] + "): " + str(service_similarity))
                 if service_similarity is None:
-                    print("ERROR: Not found [" + str(service) +  "]: " + entry[0] + "   " + entry[1])
+                    print("ERROR: Not found [" + str(service) + "]: " + entry[0] + "   " + entry[1])
                 else:
                     similarity += service_similarity
-            service_similarity.append(similarity)
+            borda_similarity.append(similarity)
             wordsim_similarity.append(entry[2])
-        return spearmanr(service_similarity, wordsim_similarity)
+        return spearmanr(borda_similarity, wordsim_similarity)
 
 
     def wordsim_spearman_rho(self, path_to_wordsim, service):
@@ -57,6 +57,36 @@ class Evaluator:
                 service_similarity.append(similarity)
                 wordsim_similarity.append(entry[2])
         return spearmanr(service_similarity, wordsim_similarity)
+
+
+    def simlex_spearman_rho_borda(self, path_to_simlex, use_pos=False, *services):
+        simlex = self.__load_simlex(path_to_simlex)
+        simlex_similarity = []
+        borda_similarity = []
+
+        for entry in simlex:
+            similarity = 0
+            for service in services:
+                service_similarity = 0
+
+                if use_pos:
+                    if isinstance(service, WordnetQueryService) or isinstance(service, BabelNetQueryService):
+                        service_similarity = service.get_similarity(entry[0], entry[1], entry[2])
+                    else:
+                        service_similarity = service.get_similarity(entry[0], entry[1])
+                else:
+                    service_similarity = service.get_similarity(entry[0], entry[1])
+
+                print("Similarity of " + str(service) + " on (" + entry[0] + ", " + entry[1] + "): " + str(
+                    service_similarity))
+                if service_similarity is None:
+                    print("ERROR: Not found [" + str(service) + "]: " + entry[0] + "   " + entry[1])
+                else:
+                    similarity += service_similarity
+            borda_similarity.append(similarity)
+            simlex_similarity.append(entry[3])
+        return spearmanr(borda_similarity, simlex_similarity)
+
 
     def simlex_spearman_rho(self, path_to_simlex, service, nouns_only=False, use_pos=False):
         simlex = self.__load_simlex(path_to_simlex)
@@ -81,6 +111,34 @@ class Evaluator:
         print("Number of entries not found: " + str(number_of_entries_not_found))
         return spearmanr(service_similarity, simlex_similarity)
 
+    def men_spearman_rho_borda(self, path_to_men, use_pos=False, *services):
+        men = self.__load_men(path_to_men)
+        men_similarity = []
+        borda_similarity = []
+
+        for entry in men:
+            similarity = 0
+            for service in services:
+                service_similarity = 0
+
+                if use_pos:
+                    if isinstance(service, WordnetQueryService) or isinstance(service, BabelNetQueryService):
+                        service_similarity = service.get_similarity(concept_1=entry[0], pos_1=entry[1], concept_2=entry[2], pos_2=entry[3])
+                    else:
+                        service_similarity = service.get_similarity(entry[0], entry[2])
+                else:
+                    service_similarity = service.get_similarity(entry[0], entry[2])
+
+                print("Similarity of " + str(service) + " on (" + entry[0] + ", " + entry[2] + "): " + str(
+                    service_similarity))
+
+                if service_similarity is None:
+                    print("ERROR: Not found [" + str(service) + "]: " + entry[0] + "   " + entry[2])
+                else:
+                    similarity += service_similarity
+            borda_similarity.append(similarity)
+            men_similarity.append(entry[4])
+        return spearmanr(borda_similarity, men_similarity)
 
     def men_spearman_rho(self, path_to_men, service, nouns_only=False, use_pos=False):
         """
@@ -178,10 +236,19 @@ class Evaluator:
                 result.append((intermediate_result[0:4]))
             return result
 
-
-
     @staticmethod
     def sum_scores(list_of_borda_scores):
+        """
+        DEPRECATED
+
+        Parameters
+        ----------
+        list_of_borda_scores
+
+        Returns
+        -------
+
+        """
         GsBordaEntryResult = namedtuple('Entry', 'w1 w2 score')
         final_score_card = []
         for score_list in list_of_borda_scores:
@@ -195,10 +262,19 @@ class Evaluator:
                     final_score_card.append(entry)
         return final_score_card
 
-
-
     @staticmethod
     def get_relative_score_for_borda(score_map):
+        """
+        DEPRECATED
+
+        Parameters
+        ----------
+        score_map
+
+        Returns
+        -------
+
+        """
         # remove 0 values (exact 0 values are not found by system)
         descending_list = []
         for entry in score_map:
@@ -219,9 +295,21 @@ class Evaluator:
             position += 1
         return result
 
-
     @staticmethod
     def get_entry_of_relative_score_for_borda(relative_score_for_borda, w1, w2):
+        """
+        DEPRECATED
+
+        Parameters
+        ----------
+        relative_score_for_borda
+        w1
+        w2
+
+        Returns
+        -------
+
+        """
         for entry in relative_score_for_borda:
             if entry.w1 == w1 and entry.w2 == w2:
                 return entry
@@ -241,34 +329,45 @@ def main():
     #print("MEN [all] (BabelNet): " + str(evaluator.men_spearman_rho(men_gs, babelnet_service, nouns_only=False, use_pos=True)))
     #print("MEN [nouns] (BabelNet): " + str(evaluator.men_spearman_rho(men_gs, babelnet_service, nouns_only=True, use_pos=False)))
 
-    dbpedia_service = DBpediaQueryService(entity_file='/work/jportisc/Walk_Generation_dbpedia_100_8_df/cache/dbpedia_entities.txt', model_file='/work/jportisc/models/iteration_2/dbpedia/100_8/dbpedia_100_8_df')
+    dbpedia_service = DBpediaQueryService(entity_file='/work/jportisc/Walk_Generation_dbpedia_100_8_df/cache/dbpedia_entities.txt',
+                                          vector_file='/work/jportisc/models/iteration_4/dbpedia/sg200_dbpedia_100_8_df_mc1_updated_vectors.kv',
+                                          redirect_file="/work/jportisc/dbpedia_rdf/redirects/redirects_en.ttl")
     print("WordSim-353 (DBpedia): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, dbpedia_service)))
     print("SimLex-999 [all] (DBpedia): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbpedia_service, nouns_only=False, use_pos=False)))
     print("SimLex-999 [nouns] (DBpedia): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbpedia_service, nouns_only=True, use_pos=False)))
     print("MEN [all] (DBpedia): " + str(evaluator.men_spearman_rho(men_gs, dbpedia_service, nouns_only=False, use_pos=False)))
     print("MEN [nouns] (DBpedia): " + str(evaluator.men_spearman_rho(men_gs, dbpedia_service, nouns_only=True, use_pos=False)))
 
-    dbnary_service = DbnaryQueryService(entity_file="/work/jportisc/EmbeddingServer/dbnary/dbnary_entities.txt", model_file="/work/jportisc/models/iteration_2/wiktionary/without_vocab_loss/sg200_dbnary_500_8_df_all")
+    dbnary_service = DbnaryQueryService(entity_file="/work/jportisc/EmbeddingServer/dbnary/dbnary_entities.txt",
+                                        is_reduced_vector_file=True,
+                                        vector_file="/work/jportisc/Training_iteration_3/dbnary/sg200_dbnary_100_8_df_mc1_it3_reduced_vectors.kv")
     print("WordSim-353 (DBnary): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, dbnary_service)))
     print("SimLex-999 [all] (DBnary): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbnary_service, nouns_only=False, use_pos=False)))
     print("SimLex-999 [nouns] (DBnary): " + str(evaluator.simlex_spearman_rho(simlex_gs, dbnary_service, nouns_only=True, use_pos=False)))
     print("MEN [all] (DBnary): " + str(evaluator.men_spearman_rho(men_gs, dbnary_service, nouns_only=False, use_pos=False)))
     print("MEN [nouns] (DBnary): " + str(evaluator.men_spearman_rho(men_gs, dbnary_service, nouns_only=True, use_pos=False)))
 
-    alod_service = AlodQueryService(model_file="/work/jportisc/models/iteration_2/alod/100_4_df/alodc_df_100_4")
+    alod_service = AlodQueryService(model_file="/work/jportisc/Training_iteration_3/alod/sg200_alod_100_8_df_mc1_it3")
     print("WordSim-353 (ALOD): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, alod_service)))
     print("SimLex-999 [all] (ALOD): " + str(evaluator.simlex_spearman_rho(simlex_gs, alod_service, nouns_only=False, use_pos=False)))
     print("SimLex-999 [nouns] (ALOD): " + str(evaluator.simlex_spearman_rho(simlex_gs, alod_service, nouns_only=True, use_pos=False)))
     print("MEN [all] (ALOD): " + str(evaluator.men_spearman_rho(men_gs, alod_service, nouns_only=False, use_pos=False)))
     print("MEN [nouns] (ALOD): " + str(evaluator.men_spearman_rho(men_gs, alod_service, nouns_only=True, use_pos=False)))
 
-    wordnet_service = WordnetQueryService(entity_file='/work/jportisc/EmbeddingServer/wordnet/wordnet_entities.txt', model_file='/work/jportisc/models/iteration_2/wordnet/without_strings/sg200_wordnet_500_8_df_without_strings')
+    wordnet_service = WordnetQueryService(entity_file='/work/jportisc/EmbeddingServer/wordnet/wordnet_entities.txt',
+                                          model_file='/work/jportisc/Training_iteration_3/wordnet/sg200_wordnet_100_8_df_mc1_it3')
     print("WordSim-353 (WordNet): " + str(evaluator.wordsim_spearman_rho(wordSim_353_similarity_gs, wordnet_service)))
     print("SimLex-999 [all] (WordNet): " + str(evaluator.simlex_spearman_rho(simlex_gs, wordnet_service, nouns_only=False, use_pos=True)))
     print("SimLex-999 [nouns] (WordNet): " + str(evaluator.simlex_spearman_rho(simlex_gs, wordnet_service, nouns_only=True, use_pos=True)))
     print("MEN [all] (WordNet): " + str(evaluator.men_spearman_rho(men_gs, wordnet_service, nouns_only=False, use_pos=True)))
     print("MEN [nouns] (WordNet): " + str(evaluator.men_spearman_rho(men_gs, wordnet_service, nouns_only=True, use_pos=True)))
 
+    print("WordSim-353 (Borda): " + str(evaluator.wordsim_spearman_rho_borda(wordSim_353_similarity_gs, dbpedia_service,
+                                                                             dbnary_service, alod_service, wordnet_service)))
+    print("Simlex-999 (Borda): " + str(evaluator.simlex_spearman_rho_borda(simlex_gs, True, dbpedia_service, dbnary_service,
+                                                                           alod_service, wordnet_service)))
+    print("MEN (Borda): " + str(evaluator.men_spearman_rho_borda(men_gs, True, dbpedia_service, dbnary_service,
+                                                                    alod_service, wordnet_service)))
 
 if __name__ == "__main__":
     main()

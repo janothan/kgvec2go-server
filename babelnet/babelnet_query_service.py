@@ -174,6 +174,9 @@ class BabelNetQueryService:
             return "{}"
         return '{ "uri": "' + vector + '",\n"vector": ' + self.__to_json_arry(vector) + '}'
 
+    def get_similarity(self, concept_1, concept_2, pos):
+        return self.get_similarity(concept_1, concept_2, pos, pos)
+
     def get_similarity(self, concept_1, concept_2, pos_1='n', pos_2='n'):
         """Calculate the similarity between the two given concepts.
 

@@ -1,33 +1,67 @@
 {% extends "base.html" %}
 {% block query_active %}active{% endblock %}
 {% block header_1 %}Query the Data in Your Browser{% endblock %}
-{% block script_include %}<script type='text/javascript' src="static/scripts.js"></script>{% endblock %}
+{% block script_include %}
+<script src="static/scripts.js" type='text/javascript'></script>{% endblock %}
 {% block content_1 %}
+
+<h2>Similarity</h2>
+<p>This is the GUI version of the API call "Get Similarity".</p>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="concept1">Concept 1 Label</label>
+                <input class="form-control" id="concept1" type="text">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="concept2">Concept 2 Label</label>
+                <input class="form-control" id="concept2" type="text">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-outline-secondary" id="similarity-button" type="button">Search
+            </button>
+        </div>
+    </div>
+</div>
+<br/>
+<h2>N Closest Concepts</h2>
+<p>This is the GUI version of the API call "N Closest Concepts".
+    Note that due to many million cosine calculations to be performed for each query, a request might take a long time
+    to complete.</p>
+<br/>
 <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
-        <a id="wordnet-nav" class="nav-link active" href="#">WordNet</a>
+        <a class="nav-link" href="#" id="alod-nav">ALOD</a>
     </li>
     <li class="nav-item">
-        <a id="wiktionary-nav" class="nav-link" href="#">Wiktionary</a>
+        <a class="nav-link" href="#" id="dbpedia-nav">DBpedia</a>
     </li>
     <li class="nav-item">
-        <a id="babelnet-nav" class="nav-link" href="#">BabelNet</a>
+        <a class="nav-link active" href="#" id="wordnet-nav">WordNet</a>
     </li>
     <li class="nav-item">
-        <a id="alod-nav" class="nav-link" href="#">ALOD</a>
+        <a class="nav-link" href="#" id="wiktionary-nav">Wiktionary</a>
     </li>
     <li class="nav-item">
-        <a id="dbpedia-nav" class="nav-link" href="#">DBpedia</a>
+        <a class="nav-link" href="#" id="babelnet-nav">BabelNet</a>
     </li>
 </ul>
 <br/>
 <div class="input-group mb-3">
-    <input id="search_field" type="text" class="form-control" placeholder="Search Term" aria-label="Search Term"
-           aria-describedby="button-addon2">
+    <input aria-describedby="button-addon2" aria-label="Search Term" class="form-control" id="search_field"
+           placeholder="Search Term"
+           type="text">
     <div class="input-group-append">
-        <button id="query-search-button" class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+        <button class="btn btn-outline-secondary" id="query-search-button" id="button-addon2" type="button">Search
+        </button>
     </div>
     <br/><br/>
 </div>
-    <div id = "query-result"></div>
+<div id="query-result"></div>
 {% endblock %}

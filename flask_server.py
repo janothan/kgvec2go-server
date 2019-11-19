@@ -10,9 +10,10 @@ app = Flask(__name__)
 print("Initiating Server...")
 
 @app.route('/index.html')
+@app.route('/about.html')
 @app.route("/")
 def show_start_page():
-    return render_template("query.html")
+    return render_template("about.html")
 
 @app.route('/query.html')
 def show_query_page():
@@ -30,9 +31,9 @@ def show_download_page():
 def show_api_page():
     return render_template("api.html")
 
-@app.route('/about.html')
+@app.route('/contact.html')
 def show_about_page():
-    return render_template("about.html")
+    return render_template("contact.html")
 
 @app.route("/robots.txt")
 def robots_txt():
@@ -47,10 +48,14 @@ if on_local:
     path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
     path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
     path_to_dbpedia_redirects = "/Users/janportisch/Documents/Research/DBpedia/redirects_en.ttl"
-    dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
-    #dbpedia_service = 0
+    #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
+    dbpedia_service = 0
     alod_service = 0
     wordnet_service = 0
+    path_to_wordnet_model = "/Users/janportisch/Documents/Language_Models/wordnet/iteration3/sg200_wordnet_100_8_df_mc1_it3"
+    path_to_wordnet_entities = "/Users/janportisch/Documents/Language_Models/wordnet/wordnet_entities.txt"
+    #wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model,
+    #                                      is_reduced_vector_file=False)
     dbnary_service = 0
 else:
     print("Using server environment.")
@@ -70,9 +75,10 @@ else:
 
     # WordNet
     #path_to_wordnet_vectors = "/disk/wordnet/sg200_wordnet_500_8_df_mc1_it3_vectors.kv"
-    path_to_wordnet_vectors = "/disk/wordnet/sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv"
+    #path_to_wordnet_vectors = "/disk/wordnet/sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv"
+    path_to_wordnet_model = "/disk/wordnet/sg200_wordnet_100_8_df_mc1_it3"
     path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
-    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors, is_reduced_vector_file=True)
+    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model, is_reduced_vector_file=False)
 
 
 #wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
@@ -154,13 +160,11 @@ def get_similarity(data_set, concept_name_1, concept_name_2):
         result = dbnary_service.get_similarity_json(concept_name_1, concept_name_2)
         print(result)
         return result
-        return None
     elif data_set == 'wordnet':
        print("Wordnet get-vector query fired.")
        result = wordnet_service.get_similarity_json(concept_name_1, concept_name_2)
        print(result)
        return result
-       return None
     elif data_set == 'alod':
         print("ALOD Classic get-similarity query fired.")
         result = alod_service.get_similarity_json(concept_name_1, concept_name_2)

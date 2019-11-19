@@ -44,6 +44,7 @@ $('document').ready( function(){
             $('#dbpedia-nav').addClass('active');
     });
 
+
     $('#query-search-button').click(
         async function(){
             $("#query-result").html('<center><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></center>')

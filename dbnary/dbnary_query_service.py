@@ -32,6 +32,9 @@ class DbnaryQueryService:
         self.all_lemmas = self.__read_lemmas(entity_file)
         self.term_mapping = self.__map_terms(self.all_lemmas)
 
+        # cache for UI
+        self.closest_concepts_cache = {}
+
 
     def __map_terms(self, all_lemmas):
         result = {}
@@ -69,7 +72,7 @@ class DbnaryQueryService:
                 for lemma in lemma_file:
                     lemma = lemma.replace("\n", "").replace("\r", "")
                     if lemma not in self.vectors.vocab:
-                        print("The follwing lemma was not found in the vocabulary: " + lemma)
+                        print("The follwing lemma was not found in the vocabulary: " + str(lemma.encode(encoding="utf-8")))
                         number_of_vocab_errors += 1
                     else:
                         result.append(lemma)
@@ -112,10 +115,17 @@ class DbnaryQueryService:
     def find_closest_lemmas(self, lemma, top):
         print("Closest lemma query for " + lemma + " received.")
         lookup_key = self.__transform_string(lemma)
+
+        if lookup_key in self.closest_concepts_cache:
+            print("Serve answer from cache.")
+            return self.closest_concepts_cache[lookup_key]
+
+        result = "{}"
         if lookup_key in self.term_mapping:
-            return self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
-        else:
-            return "{}"
+            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
+
+        self.closest_concepts_cache[lookup_key] = result
+        return result
 
     def __take_second(self, element):
         """For sorting."""
@@ -220,6 +230,8 @@ class DbnaryQueryService:
         else:
             return '{ "result" : ' + str(similarity) + " }"
 
+    def __str__(self):
+        return "DBnary/Wiktionary Query Service"
 
 def main():
     print("Start")

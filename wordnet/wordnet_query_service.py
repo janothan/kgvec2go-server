@@ -16,6 +16,8 @@ class WordnetQueryService:
         self.term_mapping = self.__map_terms(self.all_lemmas)
         self.is_reduced_vector_file = is_reduced_vector_file
 
+        self.closest_concepts_cache = {}
+
     @staticmethod
     def transform_string(string_to_be_transformed):
         """Transforms any string for lookup, also URIs.
@@ -32,6 +34,7 @@ class WordnetQueryService:
         """
 
         string_to_be_transformed = string_to_be_transformed.replace("wn-lemma:", "")
+        string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
         #string_to_be_transformed = string_to_be_transformed.lower()
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = re.sub(pattern='#.*$', repl="", string=string_to_be_transformed)
@@ -98,15 +101,31 @@ class WordnetQueryService:
 
         print("Query for " + lemma + " received.")
         lookup_key = self.transform_string(lemma)
+
+        if lookup_key in self.closest_concepts_cache:
+            print("Serve answer from cache.")
+            return self.closest_concepts_cache[lookup_key]
+
         if lookup_key in self.term_mapping:
             result_list = []
             for concept in self.all_lemmas:
-                temp_result_list = []
+                #old
+                #temp_result_list = []
+                #for uri in self.term_mapping[lookup_key]:
+                #    temp_result_list.append((concept, self.vectors.similarity(uri, concept)))
+                ## only add the top value
+                #temp_result_list.sort(key=self.__take_second, reverse=True)
+                #result_list.append(temp_result_list[0])
+
+                #new
+                similarity = 0
                 for uri in self.term_mapping[lookup_key]:
-                    temp_result_list.append((concept, self.vectors.similarity(uri, concept)))
-                temp_result_list.sort(key=self.__take_second, reverse=True)
-                result_list.append(temp_result_list[0])
+                    similarity += self.vectors.similarity(uri, concept)
+                result_list.append((concept, similarity/len(self.term_mapping[lookup_key])))
+
             result_list.sort(key=self.__take_second, reverse=True)
+
+            # output
             result_list = result_list[:int(top)]
             result = '{\n"result": [\n'
             is_first = True
@@ -117,9 +136,12 @@ class WordnetQueryService:
                 else:
                     result += ',\n{ "concept":"' + str(entry[0]) + '", "score":' + str(entry[1]) + "}"
             result += "\n]\n}"
+            self.closest_concepts_cache[lookup_key] = result
             return result
         else:
-            return "{}"
+            result = "{}"
+            self.closest_concepts_cache[lookup_key] = result
+            return result
 
     def __take_second(self, element):
         """For sorting."""
@@ -174,7 +196,7 @@ class WordnetQueryService:
         if lookup_key_1 in self.term_mapping and lookup_key_2 in self.term_mapping:
             # always pick the noun if there are multiple matches
             vector_1 = self.__pick_pos_vector(self.term_mapping[lookup_key_1], pos=pos_1)
-            vector_2 = self.__pick_pos_vector(self.term_mapping[lookup_key_1], pos=pos_2)
+            vector_2 = self.__pick_pos_vector(self.term_mapping[lookup_key_2], pos=pos_2)
             return self.vectors.similarity(vector_1, vector_2)
         else:
             return None
@@ -225,6 +247,9 @@ class WordnetQueryService:
             return "{}"
         else:
             return '{ "result" : ' + str(similarity) + " }"
+
+    def __str__(self):
+        return "WordNet Query Service"
 
 def main():
     print("Start")

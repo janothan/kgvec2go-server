@@ -24,6 +24,9 @@ class AlodQueryService:
 
         self.all_lemmas = self.__read_lemmas()
 
+        # cache for closests concepts
+        self.closest_concepts_cache = {}
+
 
 
     def __transform_string(self, string_to_be_transformed):
@@ -59,9 +62,10 @@ class AlodQueryService:
         if key not in self.word_vectors.vocab:
             return None
 
+
         result = '{\n"result": [\n'
         is_first = True
-        for entry, similarity in self.word_vectors.most_similar(key, topn=top):
+        for entry, similarity in self.word_vectors.most_similar(key, topn=int(top)):
             if is_first:
                 is_first = False
                 result += '{ "concept":"' + str(entry) + '", "score":' + str(similarity) + "}"
@@ -94,10 +98,17 @@ class AlodQueryService:
     def find_closest_lemmas(self, lemma, top):
         print("Closest lemma query for " + lemma + " received.")
         lookup_key = self.__transform_string(lemma)
+
+        if lookup_key in self.closest_concepts_cache:
+            print("Serve answer from cache.")
+            return self.closest_concepts_cache[lookup_key]
+
+        result = "{}"
         if lookup_key in self.all_lemmas:
-            return self.find_closest_lemmas_given_key(key=self.all_lemmas[lookup_key], top=top)
-        else:
-            return "{}"
+            result = self.find_closest_lemmas_given_key(key=self.all_lemmas[lookup_key], top=top)
+
+        self.closest_concepts_cache[lookup_key] = result
+        return result
 
     def __take_second(self, element):
         """For sorting."""
@@ -170,6 +181,9 @@ class AlodQueryService:
 
     def __get_file_name(self, file_path):
         return re.search("(?<=\/)[^\/]*$", file_path).group(0)
+
+    def __str__(self):
+        return "ALOD Query Service"
 
 def main():
     print("Start")

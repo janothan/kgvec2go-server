@@ -6,6 +6,7 @@ import logging
 
 class DBpediaQueryService:
 
+
     def __init__(self, entity_file, model_file='', vector_file='', redirect_file=''):
         if vector_file != '':
             self.vectors = KeyedVectors.load(vector_file, mmap=None)
@@ -27,10 +28,12 @@ class DBpediaQueryService:
         # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
         self.term_mapping = self.__map_terms(self.all_lemmas, self.redirects)
 
+        self.closest_concepts_cache = {}
+
         print("Examples from DBpedia vocabulary")
         iteration = 0
         for word in self.vectors.vocab:
-            print(word.encode('utf-8'))
+            print(str(word.encode('utf-8')))
             iteration += 1
             if iteration > 100:
                 break
@@ -44,7 +47,7 @@ class DBpediaQueryService:
                 lemma = lemma.replace("\n", "")
                 if lemma not in self.vectors.vocab:
                     if lemma not in self.redirects:
-                        print("Could not find DBpedia concept: " + lemma)
+                        # print("Could not find DBpedia concept: " + lemma)
                         number_of_key_errors += 1
                     else:
                         number_of_redirects += 1
@@ -132,27 +135,27 @@ class DBpediaQueryService:
                     print("Coud not find " + concept_2)
                     return None
 
+        lookup_key_1 = self.term_mapping[lookup_key_1]
+        lookup_key_2 = self.term_mapping[lookup_key_2]
+
         try:
             # handling redirects
-            lookup_key_1 = self.term_mapping[lookup_key_1]
-            lookup_key_2 = self.term_mapping[lookup_key_2]
-
             if lookup_key_1 not in self.vectors.vocab:
                 print("Lookup Key 1 (" + lookup_key_1 + ") not in vocabulary. Check redirects.")
                 lookup_key_1 = self.redirects[lookup_key_1]
-                print("Lookup Key 1 redirects to: " + lookup_key_1)
+                print("Lookup Key 1 redirects to: " + str(lookup_key_1.encode(encoding="utf-8")))
             if lookup_key_2 not in self.vectors.vocab:
                 print("Lookup Key 2 (" + lookup_key_2 + ") not in vocabulary. Check redirects.")
                 lookup_key_2 = self.redirects[lookup_key_2]
-                print("Lookup Key 2 redirects to: " + lookup_key_2)
+                print("Lookup Key 2 redirects to: " + str(lookup_key_2.encode(encoding="utf-8")))
 
             similarity = self.vectors.similarity(lookup_key_1, lookup_key_2)
             #print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
             return similarity
         except KeyError:
             print("KeyError: One of the following concepts not found in vocabulary.")
-            print("\t " + str(self.term_mapping[lookup_key_1]))
-            print("\t " + str(self.term_mapping[lookup_key_2]))
+            print("\t " + str(lookup_key_1.encode(encoding="utf-8")))
+            print("\t " + str(lookup_key_2.encode(encoding="utf-8")))
             return None
 
 
@@ -183,10 +186,18 @@ class DBpediaQueryService:
         print("Closest lemma query for " + lemma + " received.")
         lookup_key = self.__transform_string(lemma)
         print("Transformed to " + lookup_key)
+
+        if lookup_key in self.closest_concepts_cache:
+            print("Serve answer from cache.")
+            return self.closest_concepts_cache[lookup_key]
+
+        result = "{}"
         if lookup_key in self.term_mapping:
-            return self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
-        else:
-            return "{}"
+            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
+
+        self.closest_concepts_cache[lookup_key] = result
+        return result
+
 
     def __take_second(self, element):
         """For sorting."""
@@ -238,6 +249,17 @@ class DBpediaQueryService:
         return result
 
     def __parse_redirects(self, path_to_redirects):
+        """
+        Reads DBpedia redirects.
+
+        Parameters
+        ----------
+        path_to_redirects
+
+        Returns
+        -------
+
+        """
         result = {}
         with open(path_to_redirects, "r", encoding="utf-8") as redirects_file:
             for line in redirects_file:
@@ -257,3 +279,6 @@ class DBpediaQueryService:
         tag = tag.rstrip(">")
         tag = tag.replace("http://dbpedia.org/resource/", "dbr:")
         return tag
+
+    def __str__(self):
+        return "DBpedia Query Service"
