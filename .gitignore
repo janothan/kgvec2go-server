@@ -162,3 +162,6 @@ test.py
 evaluation_tmp.txt
 __pycache__
 sg200_dbnary_100_8_df_mc1_it3_reduced_vectors.kv
+sg200_alod_100_8_df_mc1_it3_vectors.kv
+sg200_alod_100_8_df_mc1_it3_vectors.kv.vectors.npy
+sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv

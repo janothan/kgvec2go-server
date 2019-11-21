@@ -2,9 +2,31 @@
 {% block about_active %}active{% endblock %}
 {% block header_1 %}KGvec2go{% endblock %}
 {% block content_1 %}
-KGvec2go is a semantic resource consisting of RDF2Vec knowledge graph embeddings trained currently on 4 different
-knowledge graphs.
+<h2>Welcome!</h2>
+<p>KGvec2go is a semantic resource consisting of RDF2Vec knowledge graph embeddings trained currently on 4 different
+knowledge graphs.<br/>
 
-The embeddings can be downloaded or consumed by the provided Web API. You can also explore the data set by trying
-out our Web UI.
+The embeddings can be <a href="/download.html">downloaded</a> or consumed by the provided <a href="/api.html">Web API</a> in a lightweight.
+You can also explore the data set by trying
+out our <a href="/query.html">Web UI.</a><br/>
+
+Feel free to <a href="/contact.html">contact</a> us in case of questions of problems.<p>
+
+
+<h2>Resources</h2>
+<p>Below you can find publications where you can read more about RDF2Vec, word embeddings, and KGvec2go.</p>
+<ul>
+    <li>Ristoski, Petar; Rosati,Jessica; Di Noia,Tommaso; De Leonec, Renato; Paulheim, Heiko. <i>RDF2Vec: RDF Graph Embeddingsand Their Applications</i>.
+        Semantic Web (10#4). IOS Press. Amsterdam. 2019.</li>
+    <li>Mikolov, Thomas; Sutskever, Ilya; Chen, Kai; Corrado, Gregory; Dean, Jeffrey. <i>Distributed Representations of Words and Phrases and their Compositionality. NIPS. 2013.</i></li>
+    <li>TODO KGvec2go paper</li>
+</ul>
+
+<h2>Code</h2>
+<p>The implementations are publicly available on GitHub. Note that we reimplemented the original RDF2Vec approach
+for a higher performance on our data sets. Feel free to <a href="/contact.html">contact</a> us in case of questions of problems.</p>
+<ul>
+    <li>Walk Generator</li>
+    <li>Embedding Server (the server powering page)</li>
+</ul>
 {% endblock %}

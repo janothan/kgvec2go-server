@@ -6,7 +6,6 @@ import logging
 
 class DBpediaQueryService:
 
-
     def __init__(self, entity_file, model_file='', vector_file='', redirect_file=''):
         if vector_file != '':
             self.vectors = KeyedVectors.load(vector_file, mmap=None)
@@ -191,9 +190,12 @@ class DBpediaQueryService:
             print("Serve answer from cache.")
             return self.closest_concepts_cache[lookup_key]
 
-        result = "{}"
+
         if lookup_key in self.term_mapping:
             result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
+
+        if result is None:
+            result = "{}"
 
         self.closest_concepts_cache[lookup_key] = result
         return result
@@ -280,5 +282,77 @@ class DBpediaQueryService:
         tag = tag.replace("http://dbpedia.org/resource/", "dbr:")
         return tag
 
+
+    def analogy(self, a_is_to, b_like, c_to, topn=10):
+        a_is_to_key = self.__link_term(a_is_to)
+        print(a_is_to + " linked to " + a_is_to_key)
+        b_like_key = self.__link_term(b_like)
+        print(b_like + " linked to " + b_like_key)
+        c_to_key = self.__link_term(c_to)
+        print(c_to + " linked to " + c_to_key)
+
+        if a_is_to_key is None or b_like_key is None or c_to_key is None:
+            return None
+        try:
+            result = self.vectors.most_similar(positive=[c_to_key, a_is_to_key], negative=[b_like_key], topn=10)
+        except KeyError:
+            return None
+        return result
+
+
+    def __link_term(self, term):
+        normalized_term = self.__transform_string(term)
+
+        if normalized_term not in self.term_mapping:
+            if normalized_term[0].islower():
+                print("Could not find " + normalized_term)
+                normalized_term = normalized_term[0].upper() + normalized_term[1:]
+                print("Trying " + normalized_term)
+                if normalized_term not in self.term_mapping:
+                    print("Could not find " + term)
+                    return None
+                else:
+                    return self.term_mapping[normalized_term]
+        else:
+            lookup_key = self.term_mapping[normalized_term]
+
+        if lookup_key not in self.vectors.vocab:
+            print("Lookup Key (" + lookup_key + ") not in vocabulary. Check redirects.")
+            if lookup_key not in self.redirects:
+                return None
+            lookup_key = self.redirects[lookup_key]
+            print("Lookup Key 1 redirects to: " + str(lookup_key.encode(encoding="utf-8")))
+            return lookup_key
+        else:
+            return lookup_key
+
+
     def __str__(self):
         return "DBpedia Query Service"
+
+
+def main():
+    path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
+    path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
+    path_to_dbpedia_redirects = "/Users/janportisch/Documents/Research/DBpedia/redirects_en.ttl"
+    # dbpedia_service = 0
+    dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors,
+                                          redirect_file=path_to_dbpedia_redirects)
+    print("Load complete. Run query.")
+    for key, sim in dbpedia_service.analogy("Berlin", "Germany", "Paris"):
+        print(str(key) + "   " + str(sim))
+
+    for key, sim in dbpedia_service.analogy("Germany", "Europe", "China"):
+        print(str(key) + "   " + str(sim))
+
+    for key, sim in dbpedia_service.analogy("Merkel", "Germany", "France"):
+        print(str(key) + "   " + str(sim))
+
+    for key, sim in dbpedia_service.analogy("Ludwig van Beethoven", "Bonn", "Johann Sebastian Bach"):
+        print(str(key) + "   " + str(sim))
+
+    for key, sim in dbpedia_service.analogy("Ludwig van Beethoven", "Bonn", "Bill Clinton"):
+        print(str(key) + "   " + str(sim))
+
+if __name__ == "__main__":
+    main()

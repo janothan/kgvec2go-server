@@ -40,7 +40,7 @@ def robots_txt():
     return render_template("robots.txt")
 
 
-on_local = True
+on_local = False
 
 
 if on_local:
@@ -48,30 +48,36 @@ if on_local:
     path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
     path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
     path_to_dbpedia_redirects = "/Users/janportisch/Documents/Research/DBpedia/redirects_en.ttl"
-    #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
     dbpedia_service = 0
+    #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
     alod_service = 0
-    wordnet_service = 0
+    #wordnet_service = 0
     path_to_wordnet_model = "/Users/janportisch/Documents/Language_Models/wordnet/iteration3/sg200_wordnet_100_8_df_mc1_it3"
     path_to_wordnet_entities = "/Users/janportisch/Documents/Language_Models/wordnet/wordnet_entities.txt"
-    #wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model,
-    #                                      is_reduced_vector_file=False)
+    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model,
+                                          is_reduced_vector_file=False)
     dbnary_service = 0
 else:
     print("Using server environment.")
 
     # DBpedia linux
-    #path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
-    #path_to_dbpedia_entities = "/disk/dbpedia/dbpedia_entities.txt"
+    path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
+    path_to_dbpedia_entities = "/disk/dbpedia/dbpedia_entities.txt"
+    path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
+    dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
+    print("DBpedia service initiated.")
 
     # ALOD
     path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
     alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
+    print("ALOD service initiated.")
+
 
     # DBnary / Wiktionary
     path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
     path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
     dbnary_service = DbnaryQueryService(entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors)
+    print("Wiktionary service initiated.")
 
     # WordNet
     #path_to_wordnet_vectors = "/disk/wordnet/sg200_wordnet_500_8_df_mc1_it3_vectors.kv"
@@ -79,7 +85,7 @@ else:
     path_to_wordnet_model = "/disk/wordnet/sg200_wordnet_100_8_df_mc1_it3"
     path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
     wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model, is_reduced_vector_file=False)
-
+    print("WordNet service initiated.")
 
 #wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
 #                                         model_file='./wordnet/wordnet_500_8/sg200_wordnet_500_8')
@@ -87,9 +93,6 @@ else:
 #
 
 print("Server Initiated.")
-
-
-
 
 @app.route('/rest/closest-concepts/<data_set>/<top_n>/<concept_name>', methods=['GET'])
 def closest_concepts(data_set, top_n, concept_name):
