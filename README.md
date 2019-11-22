@@ -4,4 +4,4 @@ It is based on <a href="https://www.palletsprojects.com/p/flask/">flask</a> as w
 <a href="https://radimrehurek.com/gensim/">gensim</a> and can be run with 
 <a href="https://httpd.apache.org/">Apache HTTP Server</a>.
 
-Note that the walks were generated using project <a href="">KGvec2go Walks</a>. 
+Note that the walks were generated using project <a href="https://github.com/janothan/kgvec2go-walks">KGvec2go Walks</a>. 
