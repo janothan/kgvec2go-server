@@ -45,17 +45,17 @@ on_local = False
 
 if on_local:
     print("Using local environment.")
-    path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
-    path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
-    path_to_dbpedia_redirects = "/Users/janportisch/Documents/Research/DBpedia/redirects_en.ttl"
+    path_to_dbpedia_vectors = "//Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/sg200_dbpedia_100_8_df_mc1.kv"
+    path_to_dbpedia_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/dbpedia_entities.txt"
+    path_to_dbpedia_redirects = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/redirects_en.ttl"
     dbpedia_service = 0
     #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
     alod_service = 0
     #wordnet_service = 0
-    path_to_wordnet_model = "/Users/janportisch/Documents/Language_Models/wordnet/iteration3/sg200_wordnet_100_8_df_mc1_it3"
-    path_to_wordnet_entities = "/Users/janportisch/Documents/Language_Models/wordnet/wordnet_entities.txt"
-    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model,
-                                          is_reduced_vector_file=False)
+    path_to_wordnet_vectors = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/sg200_wordnet_500_8_df_mc1_it3_reduced_vectors.kv"
+    path_to_wordnet_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/wordnet_entities.txt"
+    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors,
+                                          is_reduced_vector_file=True)
     dbnary_service = 0
 else:
     print("Using server environment.")

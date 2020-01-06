@@ -3,15 +3,61 @@ import gensim
 import logging
 import os
 import gzip
+import numpy as np
+from gensim.models import KeyedVectors
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', filename='word2vec_log.out', level=logging.INFO)
 
-def main():
 
-    # define the path to the sentences below
-    path_to_sentences = r'/work/jportisc/Walk_Generation_babelnet_100_8_df_mt/walks_df_babelnet_100_en/'
-    sg200name = 'sg200_babelnet_100_8_df_mc1_updated'
+def save_vector_file(path_to_model, path_to_vector_file):
+    print("Parsing: " + path_to_model)
+    model = gensim.models.Word2Vec.load(path_to_model)
+    print("Model parsed. Writing vector file: " + path_to_vector_file)
+    model.wv.save(path_to_vector_file)
+    print("Vector file written.")
 
+def shrink_vectors(vectors, path_to_concept_file, file_to_write):
+    concepts_to_be_kept = read_concept_file(path_to_concept_file)
+    print("File with concepts that shall be kept read.")
+
+    new_vectors = []
+    new_vocab = {}
+    new_index2entity = []
+    new_vectors_norm = []
+
+    # dummy call
+    vectors.most_similar(next(iter(vectors.vocab.keys())))
+
+    for i in range(len(vectors.vocab)):
+        word = vectors.index2entity[i]
+        vec = vectors.vectors[i]
+        vocab = vectors.vocab[word]
+        vec_norm = vectors.vectors_norm[i]
+        if word in concepts_to_be_kept:
+            vocab.index = len(new_index2entity)
+            new_index2entity.append(word)
+            new_vocab[word] = vocab
+            new_vectors.append(vec)
+            new_vectors_norm.append(vec_norm)
+
+    vectors.vocab = new_vocab
+    vectors.vectors = np.array(new_vectors)
+    vectors.index2entity = np.array(new_index2entity)
+    vectors.index2word = np.array(new_index2entity)
+    vectors.vectors_norm = np.array(new_vectors_norm)
+    vectors.save(file_to_write)
+    return vectors
+
+def read_concept_file(path_to_concept_file):
+    result = []
+    with open(path_to_concept_file, errors='ignore') as concept_file:
+        for lemma in concept_file:
+            lemma = lemma.replace("\n", "").replace("\r", "")
+            result.append(lemma)
+    print("File read.")
+    return result
+
+def train(path_to_sentences, file_to_write):
 
     # a memory-friendly iterator
     class MySentences(object):
@@ -38,7 +84,7 @@ def main():
     logging.info('Sentences Object successfully initialized.')
 
     # sg 200
-    model = gensim.models.Word2Vec(size=200, workers=20, sample=0, min_count=1, window=5, sg=1, negative=25, iter=5, sentences=sentences)
+    model = gensim.models.Word2Vec(size=200, workers=20, window=5, sg=1, negative=25, iter=5, sentences=sentences)
     #print('Gensim Model SG 200 initialized. Building vocabulary...')
 
     # Build Vocabulary
@@ -49,35 +95,29 @@ def main():
     #model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
 
     logging.info('SG 200 trained - Saving...')
-    model.save(sg200name)
+    model.save(file_to_write)
     logging.info('SG 200 saved.')
 
-    print("DONE")
+    print("Training DONE")
 
 
-'''
-This method rewrites a given word2vec model in a Java-friendly format. The Java project can consume the resulting file.
-File Structure:
-- 1 concept per line
-- concept <space> <vector-components space separated>
-'''
-def rewrite_model_for_java_gzipped(path_to_model, path_to_output_file):
-    print('Starting Rewriting Model for Java')
-    model = gensim.models.Word2Vec.load(path_to_model)
-    content_to_write = []
+def main():
+    path_to_sentences = r'./walks'
+    file_to_write = r'./sg200_dbnary_utf8_500_8_df_mc5'
+    path_to_concepts_file = r"./cache/dbnary_entities.txt"
+    train(path_to_sentences, file_to_write)
 
-    for concept in model.wv.vocab:
-        resultline = concept
-        for element in model[concept]:
-            resultline = resultline + " " + str(element)
-        content_to_write.append(resultline)
+    # save vectors
+    print("Saving vectors.")
+    vector_file_name = file_to_write + "_vectors.kv"
+    save_vector_file(file_to_write, vector_file_name)
 
-    outputFile = gzip.open(path_to_output_file, 'wb')
-    for line in content_to_write:
-        outputFile.write((line + "\n").encode('utf-8'))
-    outputFile.close()
-    print(str(len(content_to_write)) + " concepts written.")
-    print("Model for Java rewritten.")
+    print("Shrinking vectors")
+    shrink_vectors(KeyedVectors.load(vector_file_name, mmap='r'))
+
+    shrink_vectors(KeyedVectors.load(vector_file_name, mmap='r'), path_to_concept_file=path_to_concepts_file,
+                   file_to_write=file_to_write + "_vectors_shrinked.kv")
 
 
-main()
+if __name__ == "__main__":
+    main()

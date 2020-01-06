@@ -190,9 +190,10 @@ class DBpediaQueryService:
             print("Serve answer from cache.")
             return self.closest_concepts_cache[lookup_key]
 
-
         if lookup_key in self.term_mapping:
             result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
+        else:
+            result = "{}"
 
         if result is None:
             result = "{}"
