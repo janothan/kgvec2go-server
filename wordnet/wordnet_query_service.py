@@ -15,7 +15,6 @@ class WordnetQueryService:
         self.all_lemmas = self.__read_lemmas(entity_file)
         self.term_mapping = self.__map_terms(self.all_lemmas)
         self.is_reduced_vector_file = is_reduced_vector_file
-
         self.closest_concepts_cache = {}
 
     @staticmethod
