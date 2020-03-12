@@ -56,8 +56,8 @@ if on_local:
     wordnet_service = 0
     path_to_wordnet_vectors = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/sg200_wordnet_500_8_df_mc1_it3_reduced_vectors.kv"
     path_to_wordnet_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/wordnet_entities.txt"
-    #wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors,
-    #                                      is_reduced_vector_file=True)
+    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors,
+                                          is_reduced_vector_file=True)
     dbnary_service = 0
 else:
     print("Using server environment.")

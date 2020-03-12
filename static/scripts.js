@@ -139,7 +139,7 @@ $('document').ready( function(){
     );
 
 
-    $('#query-search-button').click(
+    $('#button-addon2').click(
         async function(){
             $("#query-result").html('<center><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></center>')
             console.log("Closest Search Button clicked.")
