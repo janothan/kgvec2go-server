@@ -1,8 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from ast import literal_eval
 
 from dbnary.dbnary_query_service import DbnaryQueryService
 from alod.alod_query_service import AlodQueryService
 from dbpedia.dbpedia_query_service import DBpediaQueryService
+from jRDF2Vec.jRDF2Vec import jRDF2Vec
 from wordnet.wordnet_query_service import WordnetQueryService
 
 app = Flask(__name__)
@@ -40,7 +42,7 @@ def robots_txt():
     return render_template("robots.txt")
 
 
-on_local = False
+on_local = True
 
 
 if on_local:
@@ -51,11 +53,11 @@ if on_local:
     dbpedia_service = 0
     #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
     alod_service = 0
-    #wordnet_service = 0
+    wordnet_service = 0
     path_to_wordnet_vectors = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/sg200_wordnet_500_8_df_mc1_it3_reduced_vectors.kv"
     path_to_wordnet_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/wordnet_entities.txt"
-    wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors,
-                                          is_reduced_vector_file=True)
+    #wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors,
+    #                                      is_reduced_vector_file=True)
     dbnary_service = 0
 else:
     print("Using server environment.")
@@ -92,7 +94,30 @@ else:
 #
 #
 
+# initialize jRDF2Vec
+rdf_2_vec = jRDF2Vec()
+
 print("Server Initiated.")
+
+
+
+@app.route('/rest/rdf2vec-light/<data_set>/<walks>/<mode>/<dimension>', methods=['GET'])
+def rdf2vec_light(data_set, walks, mode, dimension):
+    # sanity check:
+    if data_set.lower() != "dbpedia":
+        print("Only DBpedia allowed")
+        return None
+    if request is None:
+        print("none")
+    entities = request.headers.get('entities')
+    if entities is None:
+        print("ERROR: Entities are missing in header.")
+        return None
+    entities = literal_eval(entities)
+    result = rdf_2_vec.train_light(entities=entities, number_of_walks=walks, mode=mode, dimension=dimension)
+    return result
+
+
 
 @app.route('/rest/closest-concepts/<data_set>/<top_n>/<concept_name>', methods=['GET'])
 def closest_concepts(data_set, top_n, concept_name):

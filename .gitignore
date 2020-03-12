@@ -148,6 +148,13 @@ sg200_wordnet_500_8_df_with_strings
 # Mac
 .DS_Store
 
+# Exclude hdt file
+*.hdt
+
+# Exclude Models file
+/jRDF2Vec/models/*
+/melt-resources
+
 # Excplicitly include gold standard
 !gold_standards/MEN_dataset_lemma_form_full.txt
 !gold_standards/SimLex-999.txt
