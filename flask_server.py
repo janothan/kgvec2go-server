@@ -59,6 +59,8 @@ if on_local:
     wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors,
                                           is_reduced_vector_file=True)
     dbnary_service = 0
+    rdf_2_vec = jRDF2Vec()
+
 else:
     print("Using server environment.")
 
@@ -66,11 +68,14 @@ else:
     path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
     path_to_dbpedia_entities = "/disk/dbpedia/dbpedia_entities.txt"
     path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
+    #dbpedia_service = 0
     dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
     print("DBpedia service initiated.")
 
     # ALOD
     path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
+
+    #alod_service = 0
     alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
     print("ALOD service initiated.")
 
@@ -78,6 +83,8 @@ else:
     # DBnary / Wiktionary
     path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
     path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
+
+    #dbnary_service = 0
     dbnary_service = DbnaryQueryService(entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors)
     print("Wiktionary service initiated.")
 
@@ -86,8 +93,13 @@ else:
     #path_to_wordnet_vectors = "/disk/wordnet/sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv"
     path_to_wordnet_model = "/disk/wordnet/sg200_wordnet_100_8_df_mc1_it3"
     path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
+
+    #wordnet_service = 0
     wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model, is_reduced_vector_file=False)
     print("WordNet service initiated.")
+
+    rdf_2_vec = jRDF2Vec(jrdf_2_vec_directory="/mnt/disk/server/EmbeddingServer/jRDF2Vec/")
+    print("RDF2Vec Service initiated")
 
 #wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
 #                                         model_file='./wordnet/wordnet_500_8/sg200_wordnet_500_8')
@@ -95,7 +107,6 @@ else:
 #
 
 # initialize jRDF2Vec
-rdf_2_vec = jRDF2Vec()
 
 print("Server Initiated.")
 
