@@ -6,7 +6,7 @@ import gzip
 import numpy as np
 from gensim.models import KeyedVectors
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', filename='word2vec_log.out', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', filename='log.out', level=logging.INFO)
 
 
 def save_vector_file(path_to_model, path_to_vector_file):
@@ -48,12 +48,14 @@ def shrink_vectors(vectors, path_to_concept_file, file_to_write):
         vec = vectors.vectors[i]
         vocab = vectors.vocab[word]
         vec_norm = vectors.vectors_norm[i]
+        if i % 10000 == 0:
+            print("Finished " + str(i) + " out of " + str(len(vectors.vocab)))
         if word in concepts_to_be_kept:
-            vocab.index = len(new_index2entity)
-            new_index2entity.append(word)
-            new_vocab[word] = vocab
-            new_vectors.append(vec)
-            new_vectors_norm.append(vec_norm)
+                vocab.index = len(new_index2entity)
+                new_index2entity.append(word)
+                new_vocab[word] = vocab
+                new_vectors.append(vec)
+                new_vectors_norm.append(vec_norm)
 
     vectors.vocab = new_vocab
     vectors.vectors = np.array(new_vectors)
@@ -130,11 +132,11 @@ def main():
     """
 
     print("Shrinking vectors")
-    vector_file_name = ""
-    path_to_concepts_file = ""
-    file_to_write = ""
+    vector_file_name = "./sg200_dbpedia_500_8_df_vectors.kv"
+    path_to_concepts_file = "./dbpedia_entities.txt"
+    file_to_write = "./sg200_dbpedia_500_8_df_vectors_reduced.kv"
     shrink_vectors(KeyedVectors.load(vector_file_name, mmap='r'), path_to_concept_file=path_to_concepts_file,
-                   file_to_write=file_to_write + "_vectors_shrinked.kv")
+                   file_to_write=file_to_write)
 
 
 if __name__ == "__main__":
