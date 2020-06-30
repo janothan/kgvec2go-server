@@ -42,7 +42,7 @@ def robots_txt():
     return render_template("robots.txt")
 
 
-on_local = True
+on_local = False
 
 
 if on_local:
