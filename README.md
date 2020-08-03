@@ -6,3 +6,5 @@ It is based on <a href="https://www.palletsprojects.com/p/flask/">flask</a> as w
 <a href="https://httpd.apache.org/">Apache HTTP Server</a>.
 
 Note that the walks were generated using project <a href="https://github.com/janothan/kgvec2go-walks">KGvec2go Walks</a>. 
+
+Do you want to train your own RDF2Vec embeddings? We recommend using <a href="https://github.com/dwslab/jrdf2vec">jRDF2Vec</a>.
