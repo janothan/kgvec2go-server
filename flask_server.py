@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request
 from ast import literal_eval
+import logging
 
 from dbnary.dbnary_query_service import DbnaryQueryService
 from alod.alod_query_service import AlodQueryService
 from dbpedia.dbpedia_query_service import DBpediaQueryService
 from wordnet.wordnet_query_service import WordnetQueryService
 
+logging.basicConfig(handlers=[logging.FileHandler(__file__ + '.log', 'w', 'utf-8'), logging.StreamHandler()], format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+
 app = Flask(__name__)
 
-print("Initiating Server...")
+logging.info("Initiating Server...")
 
 @app.route('/index.html')
 @app.route('/about.html')
@@ -41,50 +44,50 @@ def robots_txt():
     return render_template("robots.txt")
 
 
-on_local = False
+on_local = True
 
 
 if on_local:
-    print("Using local environment.")
+    logging.info("Using local environment.")
 
-    print("Init DBpediaQueryService")
+    logging.info("Init DBpediaQueryService")
     path_to_dbpedia_vectors = "/Users/janportisch/Documents/Data/KGvec2go_DBpedia_Optimized/sg200_dbpedia_500_8_df_vectors_reduced.kv"
     #path_to_dbpedia_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/dbpedia_entities.txt"
     path_to_dbpedia_redirects = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/redirects_en.ttl"
     dbpedia_service = DBpediaQueryService(vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
-    print("DBpediaQueryService Initialized.")
+    logging.info("DBpediaQueryService Initialized.")
 
     #dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
     alod_service = 0
     wordnet_service = 0
 
-    print("Init WordnetQueryService")
+    logging.info("Init WordnetQueryService")
     path_to_wordnet_vectors = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/sg200_wordnet_500_8_df_mc1_it3_reduced_vectors.kv"
     path_to_wordnet_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/wordnet_entities.txt"
     wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, vector_file=path_to_wordnet_vectors,
                                           is_reduced_vector_file=True)
-    print("WordnetQueryService initialized.")
+    logging.info("WordnetQueryService initialized.")
 
     dbnary_service = 0
     #rdf_2_vec = jRDF2Vec()
 
-    print("KGvec2go Operational")
+    logging.info("KGvec2go Operational")
 
 else:
-    print("Using server environment.")
+    logging.info("Using server environment.")
 
     # DBpedia linux
     path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors_reduced.kv"
     path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
     dbpedia_service = DBpediaQueryService(vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
-    print("DBpedia service initiated.")
+    logging.info("DBpedia service initiated.")
 
     # ALOD
     path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
 
     #alod_service = 0
     alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
-    print("ALOD service initiated.")
+    logging.info("ALOD service initiated.")
 
 
     # DBnary / Wiktionary
@@ -93,7 +96,7 @@ else:
 
     #dbnary_service = 0
     dbnary_service = DbnaryQueryService(entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors)
-    print("Wiktionary service initiated.")
+    logging.info("Wiktionary service initiated.")
 
     # WordNet
     #path_to_wordnet_vectors = "/disk/wordnet/sg200_wordnet_500_8_df_mc1_it3_vectors.kv"
@@ -103,12 +106,12 @@ else:
 
     #wordnet_service = 0
     wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model, is_reduced_vector_file=False)
-    print("WordNet service initiated.")
+    logging.info("WordNet service initiated.")
 
     #rdf_2_vec = jRDF2Vec(jrdf_2_vec_directory="/mnt/disk/server/EmbeddingServer/jRDF2Vec/")
     #print("RDF2Vec Service initiated")
 
-    print("KGvec2go Operational")
+    logging.info("KGvec2go Operational")
 
 #wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
 #                                         model_file='./wordnet/wordnet_500_8/sg200_wordnet_500_8')
@@ -117,7 +120,7 @@ else:
 
 # initialize jRDF2Vec
 
-print("Server Initiated.")
+logging.info("Server Initiated.")
 
 
 

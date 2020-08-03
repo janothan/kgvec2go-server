@@ -2,6 +2,7 @@ import gensim
 import re
 from collections import namedtuple
 from gensim.models import KeyedVectors
+import logging
 
 
 class WordnetQueryService:
@@ -90,8 +91,16 @@ class WordnetQueryService:
         return result
 
     def find_closest_lemmas(self, lemma, top):
-        """The wordnet data set is structured according to word fuction (noun, verb etc.). Here, the results are
+        """The wordnet data set is structured according to word function (noun, verb etc.). Here, the results are
         merged (e.g. for 'sleep' the lemmas 'sleep-n' and 'sleep-v' are merged.
+
+        Parameters
+        ----------
+        lemma : str
+            Lemma for which closest lemmas shall be obtained.
+
+        top : str
+            Top N most related concepts. Will be casted to int.
 
         Returns
         -------

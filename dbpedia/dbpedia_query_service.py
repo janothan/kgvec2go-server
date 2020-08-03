@@ -1,8 +1,6 @@
 import gensim
 from gensim.models import KeyedVectors
-from collections import namedtuple
 import logging
-
 
 class DBpediaQueryService:
 
@@ -13,7 +11,7 @@ class DBpediaQueryService:
             self.model = gensim.models.Word2Vec.load(model_file)
             self.vectors = self.model.wv
         else:
-            print("ERROR - a model or vector file needs to be specified.")
+            logging.error("ERROR - a model or vector file needs to be specified.")
 
         self.all_lemmas = []
         self.redirects = {}
@@ -45,9 +43,9 @@ class DBpediaQueryService:
                         number_of_redirects += 1
                 else:
                     result.add(lemma.replace("\n", "").replace("\r", ""))
-        print("DBpedia lemmas read.")
-        print("Number of key errors " + str(number_of_key_errors))
-        print("Number of redirects " + str(number_of_redirects))
+        logging.info("DBpedia lemmas read.")
+        logging.info("Number of key errors " + str(number_of_key_errors))
+        logging.info("Number of redirects " + str(number_of_redirects))
         return result
 
     def __map_terms(self, all_lemmas, redirects):
@@ -127,20 +125,20 @@ class DBpediaQueryService:
 
         if lookup_key_1 not in self.term_mapping:
             if lookup_key_1[0].islower():
-                print("Could not find " + lookup_key_1)
+                logging.info("Could not find " + lookup_key_1)
                 lookup_key_1 = lookup_key_1[0].upper() + lookup_key_1[1:]
-                print("Trying " + lookup_key_1)
+                logging.info("Trying " + lookup_key_1)
                 if lookup_key_1 not in self.term_mapping:
-                    print("Coud not find " + concept_1)
+                    logging.info("Coud not find " + concept_1)
                     return None
 
         if lookup_key_2 not in self.term_mapping:
             if lookup_key_2[0].islower():
-                print("Could not find " + lookup_key_2)
+                logging.info("Could not find " + lookup_key_2)
                 lookup_key_2 = lookup_key_2[0].upper() + lookup_key_2[1:]
-                print("Trying " + lookup_key_2)
+                logging.info("Trying " + lookup_key_2)
                 if lookup_key_2 not in self.term_mapping:
-                    print("Coud not find " + concept_2)
+                    logging.info("Could not find " + concept_2)
                     return None
 
         lookup_key_1 = self.term_mapping[lookup_key_1]
@@ -149,21 +147,21 @@ class DBpediaQueryService:
         try:
             # handling redirects
             if lookup_key_1 not in self.vectors.vocab:
-                print("Lookup Key 1 (" + lookup_key_1 + ") not in vocabulary. Check redirects.")
+                logging.info("Lookup Key 1 (" + lookup_key_1 + ") not in vocabulary. Check redirects.")
                 lookup_key_1 = self.redirects[lookup_key_1]
-                print("Lookup Key 1 redirects to: " + str(lookup_key_1.encode(encoding="utf-8")))
+                logging.info("Lookup Key 1 redirects to: " + str(lookup_key_1.encode(encoding="utf-8")))
             if lookup_key_2 not in self.vectors.vocab:
-                print("Lookup Key 2 (" + lookup_key_2 + ") not in vocabulary. Check redirects.")
+                logging.info("Lookup Key 2 (" + lookup_key_2 + ") not in vocabulary. Check redirects.")
                 lookup_key_2 = self.redirects[lookup_key_2]
-                print("Lookup Key 2 redirects to: " + str(lookup_key_2.encode(encoding="utf-8")))
+                logging.info("Lookup Key 2 redirects to: " + str(lookup_key_2.encode(encoding="utf-8")))
 
             similarity = self.vectors.similarity(lookup_key_1, lookup_key_2)
             #print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
             return similarity
         except KeyError:
-            print("KeyError: One of the following concepts not found in vocabulary.")
-            print("\t " + str(lookup_key_1.encode(encoding="utf-8")))
-            print("\t " + str(lookup_key_2.encode(encoding="utf-8")))
+            logging.error("KeyError: One of the following concepts not found in vocabulary.")
+            logging.error("\t " + str(lookup_key_1.encode(encoding="utf-8")))
+            logging.error("\t " + str(lookup_key_2.encode(encoding="utf-8")))
             return None
 
     def get_similarity_json(self, concept_1, concept_2):
@@ -206,16 +204,16 @@ class DBpediaQueryService:
         str
             A JSON message of the most related concepts.
         """
-        print("Closest lemma query for " + lemma + " received.")
+        logging.info("Closest lemma query for " + lemma + " received.")
         lookup_key = self.__transform_string(lemma)
-        print("Transformed to " + lookup_key)
+        logging.info(("Transformed to " + lookup_key))
 
         if lookup_key in self.closest_concepts_cache:
-            print("Serve answer from cache.")
+            logging.info(("Serve answer from cache."))
             return self.closest_concepts_cache[lookup_key]
 
         if lookup_key in self.term_mapping:
-            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], topn=top)
+            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], topn=int(top))
         else:
             result = "{}"
 
@@ -273,12 +271,12 @@ class DBpediaQueryService:
 
         """
         if key not in self.vectors.vocab:
-            print("Key " + str(key) + " not in vocab.")
+            logging.info(("Key " + str(key) + " not in vocab."))
             return None
 
-        print("Execute most similar operation (gensim) for key: " + key + ".")
+        logging.info(("Execute most similar operation (gensim) for key: " + key + "."))
         result_list = self.vectors.similar_by_word(key, topn=topn)
-        print("Operation completed.")
+        logging.info(("Operation completed."))
         result = '{\n"result": [\n'
         is_first = True
         for entry in list(result_list):
@@ -345,11 +343,11 @@ class DBpediaQueryService:
 
         if normalized_term not in self.term_mapping:
             if normalized_term[0].islower():
-                print("Could not find " + normalized_term)
+                logging.info("Could not find " + normalized_term)
                 normalized_term = normalized_term[0].upper() + normalized_term[1:]
-                print("Trying " + normalized_term)
+                logging.info("Trying " + normalized_term)
                 if normalized_term not in self.term_mapping:
-                    print("Could not find " + term)
+                    logging.info("Could not find " + term)
                     return None
                 else:
                     return self.term_mapping[normalized_term]
@@ -357,11 +355,11 @@ class DBpediaQueryService:
             lookup_key = self.term_mapping[normalized_term]
 
         if lookup_key not in self.vectors.vocab:
-            print("Lookup Key (" + lookup_key + ") not in vocabulary. Check redirects.")
+            logging.info("Lookup Key (" + lookup_key + ") not in vocabulary. Check redirects.")
             if lookup_key not in self.redirects:
                 return None
             lookup_key = self.redirects[lookup_key]
-            print("Lookup Key 1 redirects to: " + str(lookup_key.encode(encoding="utf-8")))
+            logging.info("Lookup Key 1 redirects to: " + str(lookup_key.encode(encoding="utf-8")))
             return lookup_key
         else:
             return lookup_key
@@ -378,7 +376,7 @@ def main():
     path_to_dbpedia_redirects = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/redirects_en.ttl"
     dbpedia_service = DBpediaQueryService(vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
 
-    print(dbpedia_service.find_closest_lemmas("Germany", 10))
+    print(dbpedia_service.find_closest_lemmas("Angela Merkel", 10))
 
     """
     path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"

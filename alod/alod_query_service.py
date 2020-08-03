@@ -62,7 +62,6 @@ class AlodQueryService:
         if key not in self.word_vectors.vocab:
             return None
 
-
         result = '{\n"result": [\n'
         is_first = True
         for entry, similarity in self.word_vectors.most_similar(key, topn=int(top)):

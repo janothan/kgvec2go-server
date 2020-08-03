@@ -174,3 +174,6 @@ sg200_alod_100_8_df_mc1_it3_vectors.kv.vectors.npy
 sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv
 train-all-document-similarity.py
 train-all-kore.py
+
+# Logs
+*.log
