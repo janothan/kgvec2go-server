@@ -6,7 +6,7 @@ import logging
 
 class DBpediaQueryService:
 
-    def __init__(self, entity_file, model_file='', vector_file='', redirect_file=''):
+    def __init__(self, model_file='', vector_file='', redirect_file=''):
         if vector_file != '':
             self.vectors = KeyedVectors.load(vector_file, mmap=None)
         elif model_file != '':
@@ -22,20 +22,13 @@ class DBpediaQueryService:
             self.redirects = self.__parse_redirects(redirect_file)
 
         # reading the instances
-        self.all_lemmas = self.__read_lemmas(entity_file)
+        #self.all_lemmas = self.__read_lemmas(entity_file)
 
         # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
-        self.term_mapping = self.__map_terms(self.all_lemmas, self.redirects)
+        self.term_mapping = self.__map_terms(self.vectors.vocab, self.redirects)
 
+        # cache init
         self.closest_concepts_cache = {}
-
-        print("Examples from DBpedia vocabulary")
-        iteration = 0
-        for word in self.vectors.vocab:
-            print(str(word.encode('utf-8')))
-            iteration += 1
-            if iteration > 100:
-                break
 
     def __read_lemmas(self, entity_file_path):
         result = set()
@@ -58,6 +51,22 @@ class DBpediaQueryService:
         return result
 
     def __map_terms(self, all_lemmas, redirects):
+        """
+
+        Parameters
+        ----------
+        all_lemmas : set of str
+            A set of all lemmas, i.e. the vocabulary.
+
+        redirects : set of str
+            A set of all redirects.
+
+        Returns
+        -------
+        dict
+            A dictionary of the form term -> uri.
+
+        """
         result = {}
         for uri in all_lemmas:
             lookup_key = self.__transform_string(uri)
@@ -157,7 +166,6 @@ class DBpediaQueryService:
             print("\t " + str(lookup_key_2.encode(encoding="utf-8")))
             return None
 
-
     def get_similarity_json(self, concept_1, concept_2):
         """Calculate the similarity between the two given concepts.
 
@@ -182,6 +190,22 @@ class DBpediaQueryService:
 
 
     def find_closest_lemmas(self, lemma, top):
+        """Find the closest concepts and return them as JSON message. The concept lemmas are returned rather than
+        the concept URIs.
+
+        Parameters
+        ----------
+        lemma : str
+            The lemma for which the most related concepts shall be determined.
+
+        top : int
+            The number of most related concepts to be returned.
+
+        Returns
+        -------
+        str
+            A JSON message of the most related concepts.
+        """
         print("Closest lemma query for " + lemma + " received.")
         lookup_key = self.__transform_string(lemma)
         print("Transformed to " + lookup_key)
@@ -191,7 +215,7 @@ class DBpediaQueryService:
             return self.closest_concepts_cache[lookup_key]
 
         if lookup_key in self.term_mapping:
-            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
+            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], topn=top)
         else:
             result = "{}"
 
@@ -231,18 +255,33 @@ class DBpediaQueryService:
                 result += ',' + str(element)
         return result + "]"
 
-    def find_closest_lemmas_given_key(self, key, top):
+    def find_closest_lemmas_given_key(self, key, topn):
+        """Closest match operation.
+
+        Parameters
+        ----------
+        key : str
+            Linked concept, i.e. "dbr:European_Union" rather than "European Union".
+
+        topn : int
+            The number of top related concepts to be returned.
+
+        Returns
+        -------
+        str
+            A JSON message of the most related concepts.
+
+        """
         if key not in self.vectors.vocab:
+            print("Key " + str(key) + " not in vocab.")
             return None
-        result_list = []
-        ResultEntry = namedtuple('ResultEntry', 'concept similarity')
-        for concept in self.all_lemmas:
-            result_list.append(ResultEntry(concept, self.vectors.similarity(key, concept)))
-        result_list.sort(key=self.__take_second, reverse=True)
-        result_list = result_list[:int(top)]
+
+        print("Execute most similar operation (gensim) for key: " + key + ".")
+        result_list = self.vectors.similar_by_word(key, topn=topn)
+        print("Operation completed.")
         result = '{\n"result": [\n'
         is_first = True
-        for entry in result_list:
+        for entry in list(result_list):
             if is_first:
                 is_first = False
                 result += '{ "concept":"' + str(entry[0]) + '", "score":' + str(entry[1]) + "}"
@@ -333,6 +372,15 @@ class DBpediaQueryService:
 
 
 def main():
+
+    path_to_dbpedia_vectors = "/Users/janportisch/Documents/Data/KGvec2go_DBpedia_Optimized/sg200_dbpedia_500_8_df_vectors_reduced.kv"
+    # path_to_dbpedia_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/dbpedia_entities.txt"
+    path_to_dbpedia_redirects = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/redirects_en.ttl"
+    dbpedia_service = DBpediaQueryService(vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
+
+    print(dbpedia_service.find_closest_lemmas("Germany", 10))
+
+    """
     path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
     path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
     path_to_dbpedia_redirects = "/Users/janportisch/Documents/Research/DBpedia/redirects_en.ttl"
@@ -354,6 +402,7 @@ def main():
 
     for key, sim in dbpedia_service.analogy("Ludwig van Beethoven", "Bonn", "Bill Clinton"):
         print(str(key) + "   " + str(sim))
+    """
 
 if __name__ == "__main__":
     main()
