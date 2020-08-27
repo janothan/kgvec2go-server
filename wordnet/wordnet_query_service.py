@@ -35,7 +35,6 @@ class WordnetQueryService:
 
         string_to_be_transformed = string_to_be_transformed.replace("wn-lemma:", "")
         string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
-        #string_to_be_transformed = string_to_be_transformed.lower()
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = re.sub(pattern='#.*$', repl="", string=string_to_be_transformed)
         return string_to_be_transformed

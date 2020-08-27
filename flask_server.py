@@ -1,16 +1,22 @@
 from flask import Flask, render_template, request
 from ast import literal_eval
 import logging
+import sys
 
 from dbnary.dbnary_query_service import DbnaryQueryService
 from alod.alod_query_service import AlodQueryService
 from dbpedia.dbpedia_query_service import DBpediaQueryService
+from jRDF2Vec.jRDF2Vec import jRDF2Vec
 from wordnet.wordnet_query_service import WordnetQueryService
 
-logging.basicConfig(handlers=[logging.FileHandler(__file__ + '.log', 'w', 'utf-8'), logging.StreamHandler()], format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+on_local = False
+
+if on_local:
+    logging.basicConfig(handlers=[logging.FileHandler(__file__ + '.log', 'w', 'utf-8'), logging.StreamHandler()], format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+else:
+    logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 app = Flask(__name__)
-
 logging.info("Initiating Server...")
 
 @app.route('/index.html')
@@ -44,9 +50,6 @@ def robots_txt():
     return render_template("robots.txt")
 
 
-on_local = True
-
-
 if on_local:
     logging.info("Using local environment.")
 
@@ -72,6 +75,7 @@ if on_local:
     #rdf_2_vec = jRDF2Vec()
 
     logging.info("KGvec2go Operational")
+    app.run(host='0.0.0.0', debug=False)
 
 else:
     logging.info("Using server environment.")
@@ -89,7 +93,6 @@ else:
     alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
     logging.info("ALOD service initiated.")
 
-
     # DBnary / Wiktionary
     path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
     path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
@@ -99,8 +102,6 @@ else:
     logging.info("Wiktionary service initiated.")
 
     # WordNet
-    #path_to_wordnet_vectors = "/disk/wordnet/sg200_wordnet_500_8_df_mc1_it3_vectors.kv"
-    #path_to_wordnet_vectors = "/disk/wordnet/sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv"
     path_to_wordnet_model = "/disk/wordnet/sg200_wordnet_100_8_df_mc1_it3"
     path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
 
@@ -108,17 +109,10 @@ else:
     wordnet_service = WordnetQueryService(entity_file=path_to_wordnet_entities, model_file=path_to_wordnet_model, is_reduced_vector_file=False)
     logging.info("WordNet service initiated.")
 
-    #rdf_2_vec = jRDF2Vec(jrdf_2_vec_directory="/mnt/disk/server/EmbeddingServer/jRDF2Vec/")
-    #print("RDF2Vec Service initiated")
+    rdf_2_vec = jRDF2Vec(jrdf_2_vec_directory="/mnt/disk/server/EmbeddingServer/jRDF2Vec/")
+    print("RDF2Vec Service initiated")
 
     logging.info("KGvec2go Operational")
-
-#wordnet_service = WordnetQueryService(entity_file='./wordnet/wordnet_500_8/wordnet_entities.txt',
-#                                         model_file='./wordnet/wordnet_500_8/sg200_wordnet_500_8')
-#
-#
-
-# initialize jRDF2Vec
 
 logging.info("Server Initiated.")
 
@@ -183,7 +177,7 @@ def get_vector(data_set, concept_name):
         print(result)
         return result
     elif data_set == 'wordnet':
-        print("Wordnet get-vector query fired.")
+        print("WordNet get-vector query fired.")
         result = wordnet_service.get_vector(concept_name)
         print(result)
         return result
@@ -229,4 +223,4 @@ def get_similarity(data_set, concept_name_1, concept_name_2):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=False)
+    main()
