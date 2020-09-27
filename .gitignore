@@ -177,3 +177,7 @@ train-all-kore.py
 
 # Logs
 *.log
+
+# Configuration
+server.conf
+000-default.conf

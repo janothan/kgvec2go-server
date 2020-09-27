@@ -2,7 +2,6 @@ import gensim
 import re
 from collections import namedtuple
 from gensim.models import KeyedVectors
-import logging
 
 
 class WordnetQueryService:
@@ -38,7 +37,6 @@ class WordnetQueryService:
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = re.sub(pattern='#.*$', repl="", string=string_to_be_transformed)
         return string_to_be_transformed
-
 
     def __map_terms(self, all_lemmas):
         result = {}
@@ -181,7 +179,6 @@ class WordnetQueryService:
                 result += ',' + str(element)
         return result + "]"
 
-
     def get_similarity(self, concept_1, concept_2, pos_1='N', pos_2='N'):
         """Calculate the similarity between the two given concepts.
 
@@ -258,6 +255,7 @@ class WordnetQueryService:
     def __str__(self):
         return "WordNet Query Service"
 
+
 def main():
     print("Start")
     service = WordnetQueryService(entity_file='./wordnet_500_8/wordnet_entities.txt',
@@ -270,6 +268,7 @@ def main():
     print(service.get_vector('sleep'))
     print(service.find_closest_lemmas('sleep', 10))
     print("End")
+
 
 if __name__ == "__main__":
     main()

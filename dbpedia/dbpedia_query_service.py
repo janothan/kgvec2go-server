@@ -2,6 +2,7 @@ import gensim
 from gensim.models import KeyedVectors
 import logging
 
+
 class DBpediaQueryService:
 
     def __init__(self, model_file='', vector_file='', redirect_file=''):
@@ -16,11 +17,11 @@ class DBpediaQueryService:
         self.all_lemmas = []
         self.redirects = {}
         if redirect_file != '':
-            logging.info("Pasing redirects...")
+            logging.info("Parsing redirects...")
             self.redirects = self.__parse_redirects(redirect_file)
 
         # reading the instances
-        #self.all_lemmas = self.__read_lemmas(entity_file)
+        # self.all_lemmas = self.__read_lemmas(entity_file)
 
         # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
         self.term_mapping = self.__map_terms(self.vectors.vocab, self.redirects)
@@ -74,7 +75,8 @@ class DBpediaQueryService:
             result[lookup_key] = uri
         return result
 
-    def __transform_string(self, string_to_be_transformed):
+    @staticmethod
+    def __transform_string(string_to_be_transformed):
         """Transforms any string for lookup, also URIs.
 
         Parameters
@@ -88,6 +90,8 @@ class DBpediaQueryService:
             Transformed string.
         """
         string_to_be_transformed = string_to_be_transformed.replace("dbr:", "")
+        string_to_be_transformed = string_to_be_transformed.replace("dbo:", "")
+        string_to_be_transformed = string_to_be_transformed.replace("http://dbpedia.org/ontology/:", "")
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
         string_to_be_transformed = string_to_be_transformed.replace("'", "_")
@@ -114,12 +118,12 @@ class DBpediaQueryService:
         lookup_key_1 = self.__transform_string(concept_1)
         lookup_key_2 = self.__transform_string(concept_2)
 
-        #try:
+        # try:
         #    mapping_1 = self.term_mapping[lookup_key_1]
         #    mapping_2 = self.term_mapping[lookup_key_2]
         #    print(concept_1 + " mapped to " + str(mapping_1))
         #    print(concept_2 + " mapped to " + str(mapping_2))
-        #except KeyError:
+        # except KeyError:
         #    #not important, just logging
         #    pass
 
@@ -129,7 +133,7 @@ class DBpediaQueryService:
                 lookup_key_1 = lookup_key_1[0].upper() + lookup_key_1[1:]
                 logging.info("Trying " + lookup_key_1)
                 if lookup_key_1 not in self.term_mapping:
-                    logging.info("Coud not find " + concept_1)
+                    logging.info("Could not find " + concept_1)
                     return None
 
         if lookup_key_2 not in self.term_mapping:
@@ -156,7 +160,7 @@ class DBpediaQueryService:
                 logging.info("Lookup Key 2 redirects to: " + str(lookup_key_2.encode(encoding="utf-8")))
 
             similarity = self.vectors.similarity(lookup_key_1, lookup_key_2)
-            #print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
+            # print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
             return similarity
         except KeyError:
             logging.error("KeyError: One of the following concepts not found in vocabulary.")
@@ -185,7 +189,6 @@ class DBpediaQueryService:
             return "{}"
         else:
             return '{ "result" : ' + str(similarity) + " }"
-
 
     def find_closest_lemmas(self, lemma, top):
         """Find the closest concepts and return them as JSON message. The concept lemmas are returned rather than
@@ -223,8 +226,8 @@ class DBpediaQueryService:
         self.closest_concepts_cache[lookup_key] = result
         return result
 
-
-    def __take_second(self, element):
+    @staticmethod
+    def __take_second(element):
         """For sorting."""
         return element[1]
 
@@ -238,11 +241,12 @@ class DBpediaQueryService:
 
             if uri is not None:
                 vector = self.vectors.get_vector(uri)
-                return '{ "uri": "' + uri + '",\n"vector": ' + self.__to_json_arry(vector) + '}'
+                return '{ "uri": "' + uri + '",\n"vector": ' + self.__to_json_array(vector) + '}'
         else:
             return "{}"
 
-    def __to_json_arry(self, vector):
+    @staticmethod
+    def __to_json_array(vector):
         result = ""
         is_first = True
         for element in vector:
@@ -313,13 +317,12 @@ class DBpediaQueryService:
                 result[source] = target
         return result
 
-
-    def __transform_tag(self, tag):
+    @staticmethod
+    def __transform_tag(tag):
         tag = tag.lstrip("<")
         tag = tag.rstrip(">")
         tag = tag.replace("http://dbpedia.org/resource/", "dbr:")
         return tag
-
 
     def analogy(self, a_is_to, b_like, c_to, topn=10):
         a_is_to_key = self.__link_term(a_is_to)
@@ -336,7 +339,6 @@ class DBpediaQueryService:
         except KeyError:
             return None
         return result
-
 
     def __link_term(self, term):
         normalized_term = self.__transform_string(term)
@@ -363,7 +365,6 @@ class DBpediaQueryService:
             return lookup_key
         else:
             return lookup_key
-
 
     def __str__(self):
         return "DBpedia Query Service"
@@ -401,6 +402,7 @@ def main():
     for key, sim in dbpedia_service.analogy("Ludwig van Beethoven", "Bonn", "Bill Clinton"):
         print(str(key) + "   " + str(sim))
     """
+
 
 if __name__ == "__main__":
     main()

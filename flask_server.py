@@ -9,7 +9,7 @@ from dbpedia.dbpedia_query_service import DBpediaQueryService
 from jRDF2Vec.jRDF2Vec import jRDF2Vec
 from wordnet.wordnet_query_service import WordnetQueryService
 
-on_local = False
+on_local = True
 
 if on_local:
     logging.basicConfig(handlers=[logging.FileHandler(__file__ + '.log', 'w', 'utf-8'), logging.StreamHandler()], format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
@@ -223,4 +223,4 @@ def get_similarity(data_set, concept_name_1, concept_name_2):
 
 
 if __name__ == "__main__":
-    main()
+   pass

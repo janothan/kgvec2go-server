@@ -1,9 +1,7 @@
-import operator
 from collections import namedtuple
 
 from alod.alod_query_service import AlodQueryService
 from scipy.stats import spearmanr
-from collections import OrderedDict
 from math import factorial
 
 from babelnet.babelnet_query_service import BabelNetQueryService
@@ -254,7 +252,7 @@ class Evaluator:
         for score_list in list_of_borda_scores:
             for entry in score_list:
                 score_card_entry = Evaluator.get_entry_of_relative_score_for_borda(final_score_card, entry.w1, entry.w2)
-                if score_card_entry != None:
+                if score_card_entry is not None:
                     final_score_card.remove(score_card_entry)
                     new_entry = GsBordaEntryResult(entry.w1, entry.w2, score_card_entry.score + entry.score)
                     final_score_card.append(new_entry)

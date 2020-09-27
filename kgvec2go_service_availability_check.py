@@ -121,7 +121,8 @@ class ServiceAvailabilityCheck:
 
 
 def main():
-    checker = ServiceAvailabilityCheck(url="http://www.kgvec2go.org")
+    #checker = ServiceAvailabilityCheck(url="http://www.kgvec2go.org")
+    checker = ServiceAvailabilityCheck(url="http://0.0.0.0:5000")
     checker.check_static_webpages()
     checker.check_get_vector()
     checker.check_get_similarity()
