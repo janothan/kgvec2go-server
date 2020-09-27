@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block about_contact %}active{% endblock %}
+{% block header_1 %}About{% endblock %}
+{% block content_1 %}
+
+<h2>Citation</h2>
+<p>
+    When using this work, please cite us:<br/>
+<pre>
+<code itemscope itemtype="https://schema.org/ScholarlyArticle"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="familyName">Portisch</span>, <span itemprop="givenName">Jan</span>; <span hidden itemprop="name">Jan Portisch</span><span hidden itemprop="identifier">https://orcid.org/0000-0001-5420-0663</span><span hidden itemprop="url">http://www.jan-portisch.eu/</span></span><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="familyName">Hladik</span>, <span itemprop="givenName">Michael</span>; <span hidden itemprop="name">Michael Hladik</span><span hidden itemprop="identifier">https://orcid.org/0000-0002-2204-3138</span></span><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="familyName">Paulheim</span>, <span itemprop="givenName">Heiko</span>. <span hidden itemprop="name">Heiko Paulheim</span><span hidden itemprop="identifier">https://orcid.org/0000-0003-4386-8195</span><span hidden itemprop="url">http://www.heikopaulheim.de/</span></span><span itemprop="name headline">KGvec2go - Knowledge Graph Embeddings as a Service</span>. LREC <span itemprop="datePublished">2020</span>.</code>
+</pre>
+
+<h2>Contact</h2>
+<!--
+<ul>
+    <li>
+        <div itemscope itemtype="http://schema.org/Person">
+            Jan <span itemprop="additionalName">Philipp</span> <span itemprop="familyName">Portisch</span>, University of Mannheim / SAP SE (<a href="mailto:jan@informatik.uni-mannheim.de">jan@informatik.uni-mannheim.de</a>)
+        </div>
+    </li>
+    <li>
+        <div itemscope itemtype="http://schema.org/Person">
+            Michael <span itemprop="familyName">Hladik</span>, SAP SE (<a href="mailto:michal.hladik@sap.com">michael.hladik@sap.com</a>)
+        </div>
+    </li>
+    <li>
+        <div itemscope itemtype="http://schema.org/Person">
+            Heiko <span itemprop="familyName">Paulheim</span>, University of Mannheim (<a href="mailto:heiko@informatik.uni-mannheim.de">jan@informatik.uni-mannheim.de</a>)
+        </div>
+    </li>
+</ul>
+</p>
+-->
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div itemscope itemtype="http://schema.org/Person">
+                    <img alt="Picture of Jan" itemprop="image" src="static/jan_quadratic.png" style="width:100%">
+                    <h1><span itemprop="givenName">Jan</span> <span itemprop="familyName">Portisch</span></h1>
+                    <!--<p class="title">PhD Student</p>-->
+                    <p><span itempro="affiliation">University of Mannheim</span> / <span
+                            itemprop="affiliation">SAP SE</span></p>
+                    <p>
+                        <!--<a class="card-link" href="#"><i class="fa fa-dribbble contact-icon"></i></a>-->
+                        <a class="card-link" href="http://www.jan-portisch.eu/" itemprop="url"><i
+                                class="fa fa-dribbble contact-icon"></i></a>
+                        <a class="card-link" href="https://twitter.com/JanPortisch"><i
+                                class="fa fa-twitter contact-icon"></i></a>
+                        <a class="card-link" href="https://www.linkedin.com/in/jan-portisch/"><i
+                                class="fa fa-linkedin contact-icon"></i></a>
+                        <!--<a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>-->
+                    </p>
+                    <form action="mailto:jan@informatik.uni-mannheim.de" method="get" target="_blank">
+                        <button class="contact-button">Contact</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div itemscope itemtype="http://schema.org/Person">
+                    <img alt="Picture of Michael" itemprop="image" src="static/michael_quadratic.jpg"
+                         style="width:100%">
+                    <h1><span itemprop="givenName">Michael</span> <span itemprop="familyName">Hladik</span></h1>
+                    <!--<p class="title"></p>-->
+                    <p>SAP SE</p>
+                    <p>
+                        <!--<a class="card-link" href=""><i
+                                class="fa fa-dribbble contact-icon"></i></a>-->
+                        <a class="card-link" href="https://twitter.com/michaelhladik"><i
+                                class="fa fa-twitter contact-icon"></i></a>
+                        <a class="card-link" href="https://www.linkedin.com/in/michaelhladik/"><i
+                                class="fa fa-linkedin contact-icon"></i></a>
+                        <!--<a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>-->
+                    </p>
+                    <form action="mailto:michael.hladik@sap.com" method="get" target="_blank">
+                        <button class="contact-button" type="submit">Contact</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div itemscope itemtype="http://schema.org/Person">
+                    <img alt="Picture of Heiko" itemprop="image" src="static/heiko_quadratic.jpg" style="width:100%">
+                    <h1><span itemprop="givenName">Heiko</span> <span itemprop="familyName">Paulheim</span></h1>
+                    <!--<p class="title"></p>-->
+                    <p>University of Mannheim</p>
+                    <p>
+                        <a class="card-link" href="http://www.heikopaulheim.com/" itemprop="url"><i
+                                class="fa fa-dribbble contact-icon"></i></a>
+                        <a class="card-link" href="https://twitter.com/heikopaulheim"><i
+                                class="fa fa-twitter contact-icon"></i></a>
+                        <a class="card-link" href="https://www.linkedin.com/in/heikopaulheim/"><i
+                                class="fa fa-linkedin contact-icon"></i></a>
+                        <!--<a class="card-link" href="#"><i class="fa fa-facebook contact-icon"></i></a>-->
+                    </p>
+                    <form action="mailto:heiko@informatik.uni-mannheim.de" method="get" target="_blank">
+                        <button class="contact-button" type="submit">Contact</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

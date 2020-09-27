@@ -3,17 +3,21 @@ from collections import namedtuple
 from scipy.stats import spearmanr
 from math import factorial
 
-from evaluation.calculate_rho import Evaluator
+from kgvec2go_server.evaluation.calculate_rho import Evaluator
 
 
 class TestSpearmanMethod:
 
     def test_spearmanr(self):
-        assert 1 == spearmanr([1, 2, 3], [4, 5, 6]).correlation
-        assert 1 == spearmanr([1, 2, 5], [4, 5, 9]).correlation
-        assert -1 == spearmanr([1, 2, 5], [100, 99, 88]).correlation
+        """This test just checks the behavior of scipy.stats.spearmanr.
+        """
+        assert 1 == spearmanr(a=[1, 2, 3], b=[4, 5, 6]).correlation
+        assert 1 == spearmanr(a=[1, 2, 5], b=[4, 5, 9]).correlation
+        assert -1 == spearmanr(a=[1, 2, 5], b=[100, 99, 88]).correlation
 
     def test_factorial(self):
+        """This test just checks the behavior of math.factorial.
+        """
         assert 6 == factorial(3)
         assert 24 == factorial(4)
         assert 2 == factorial(2)
