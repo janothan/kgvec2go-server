@@ -127,6 +127,7 @@ dmypy.json
 # project specific
 *.gz
 *.txt
+!requirements.txt
 *.npy
 *.out
 dbnary/dbnary_200_8/sg200_dbnary_200_8
@@ -165,7 +166,7 @@ model_shrinked.kv
 test_model
 test_model_vectors.kv
 test_model_vectors_reduced.kv
-test.py
+tests/test.py
 evaluation_tmp.txt
 __pycache__
 sg200_dbnary_100_8_df_mc1_it3_reduced_vectors.kv

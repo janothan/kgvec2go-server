@@ -1,4 +1,3 @@
-# import modules; set up logging
 import gensim
 import logging
 import os
@@ -15,6 +14,7 @@ def save_vector_file(path_to_model, path_to_vector_file):
     print("Model parsed. Writing vector file: " + path_to_vector_file)
     model.wv.save(path_to_vector_file)
     print("Vector file written.")
+
 
 def shrink_vectors(vectors, path_to_concept_file, file_to_write):
     """Writes a new, reduced vector file with the given concepts.
