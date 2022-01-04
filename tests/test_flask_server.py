@@ -2,7 +2,6 @@ from ast import literal_eval
 
 
 class Test:
-
     def test_rdf2vec_light_array(self):
         """
         Simply testing the correct understanding of ast.

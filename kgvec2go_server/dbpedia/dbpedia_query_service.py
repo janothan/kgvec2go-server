@@ -4,11 +4,10 @@ import logging
 
 
 class DBpediaQueryService:
-
-    def __init__(self, model_file='', vector_file='', redirect_file=''):
-        if vector_file != '':
+    def __init__(self, model_file="", vector_file="", redirect_file=""):
+        if vector_file != "":
             self.vectors = KeyedVectors.load(vector_file, mmap=None)
-        elif model_file != '':
+        elif model_file != "":
             self.model = gensim.models.Word2Vec.load(model_file)
             self.vectors = self.model.wv
         else:
@@ -16,7 +15,7 @@ class DBpediaQueryService:
 
         self.all_lemmas = []
         self.redirects = {}
-        if redirect_file != '':
+        if redirect_file != "":
             logging.info("Parsing redirects...")
             self.redirects = self.__parse_redirects(redirect_file)
 
@@ -33,7 +32,7 @@ class DBpediaQueryService:
         result = set()
         number_of_key_errors = 0
         number_of_redirects = 0
-        with open(entity_file_path, errors='ignore') as lemma_file:
+        with open(entity_file_path, errors="ignore") as lemma_file:
             for lemma in lemma_file:
                 lemma = lemma.replace("\n", "")
                 if lemma not in self.vectors.vocab:
@@ -91,7 +90,9 @@ class DBpediaQueryService:
         """
         string_to_be_transformed = string_to_be_transformed.replace("dbr:", "")
         string_to_be_transformed = string_to_be_transformed.replace("dbo:", "")
-        string_to_be_transformed = string_to_be_transformed.replace("http://dbpedia.org/ontology/:", "")
+        string_to_be_transformed = string_to_be_transformed.replace(
+            "http://dbpedia.org/ontology/:", ""
+        )
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
         string_to_be_transformed = string_to_be_transformed.replace("'", "_")
@@ -151,19 +152,35 @@ class DBpediaQueryService:
         try:
             # handling redirects
             if lookup_key_1 not in self.vectors.vocab:
-                logging.info("Lookup Key 1 (" + lookup_key_1 + ") not in vocabulary. Check redirects.")
+                logging.info(
+                    "Lookup Key 1 ("
+                    + lookup_key_1
+                    + ") not in vocabulary. Check redirects."
+                )
                 lookup_key_1 = self.redirects[lookup_key_1]
-                logging.info("Lookup Key 1 redirects to: " + str(lookup_key_1.encode(encoding="utf-8")))
+                logging.info(
+                    "Lookup Key 1 redirects to: "
+                    + str(lookup_key_1.encode(encoding="utf-8"))
+                )
             if lookup_key_2 not in self.vectors.vocab:
-                logging.info("Lookup Key 2 (" + lookup_key_2 + ") not in vocabulary. Check redirects.")
+                logging.info(
+                    "Lookup Key 2 ("
+                    + lookup_key_2
+                    + ") not in vocabulary. Check redirects."
+                )
                 lookup_key_2 = self.redirects[lookup_key_2]
-                logging.info("Lookup Key 2 redirects to: " + str(lookup_key_2.encode(encoding="utf-8")))
+                logging.info(
+                    "Lookup Key 2 redirects to: "
+                    + str(lookup_key_2.encode(encoding="utf-8"))
+                )
 
             similarity = self.vectors.similarity(lookup_key_1, lookup_key_2)
             # print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
             return similarity
         except KeyError:
-            logging.error("KeyError: One of the following concepts not found in vocabulary.")
+            logging.error(
+                "KeyError: One of the following concepts not found in vocabulary."
+            )
             logging.error("\t " + str(lookup_key_1.encode(encoding="utf-8")))
             logging.error("\t " + str(lookup_key_2.encode(encoding="utf-8")))
             return None
@@ -216,7 +233,9 @@ class DBpediaQueryService:
             return self.closest_concepts_cache[lookup_key]
 
         if lookup_key in self.term_mapping:
-            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], topn=int(top))
+            result = self.find_closest_lemmas_given_key(
+                key=self.term_mapping[lookup_key], topn=int(top)
+            )
         else:
             result = "{}"
 
@@ -241,7 +260,13 @@ class DBpediaQueryService:
 
             if uri is not None:
                 vector = self.vectors.get_vector(uri)
-                return '{ "uri": "' + uri + '",\n"vector": ' + self.__to_json_array(vector) + '}'
+                return (
+                    '{ "uri": "'
+                    + uri
+                    + '",\n"vector": '
+                    + self.__to_json_array(vector)
+                    + "}"
+                )
         else:
             return "{}"
 
@@ -254,7 +279,7 @@ class DBpediaQueryService:
                 is_first = False
                 result += "[" + str(element)
             else:
-                result += ',' + str(element)
+                result += "," + str(element)
         return result + "]"
 
     def find_closest_lemmas_given_key(self, key: str, topn: int):
@@ -286,9 +311,21 @@ class DBpediaQueryService:
         for entry in list(result_list):
             if is_first:
                 is_first = False
-                result += '{ "concept":"' + str(entry[0]) + '", "score":' + str(entry[1]) + "}"
+                result += (
+                    '{ "concept":"'
+                    + str(entry[0])
+                    + '", "score":'
+                    + str(entry[1])
+                    + "}"
+                )
             else:
-                result += ',\n{ "concept":"' + str(entry[0]) + '", "score":' + str(entry[1]) + "}"
+                result += (
+                    ',\n{ "concept":"'
+                    + str(entry[0])
+                    + '", "score":'
+                    + str(entry[1])
+                    + "}"
+                )
         result += "\n]\n}"
         return result
 
@@ -335,7 +372,9 @@ class DBpediaQueryService:
         if a_is_to_key is None or b_like_key is None or c_to_key is None:
             return None
         try:
-            result = self.vectors.most_similar(positive=[c_to_key, a_is_to_key], negative=[b_like_key], topn=10)
+            result = self.vectors.most_similar(
+                positive=[c_to_key, a_is_to_key], negative=[b_like_key], topn=10
+            )
         except KeyError:
             return None
         return result
@@ -358,11 +397,15 @@ class DBpediaQueryService:
             lookup_key = self.term_mapping[normalized_term]
 
         if lookup_key not in self.vectors.vocab:
-            logging.info("Lookup Key (" + lookup_key + ") not in vocabulary. Check redirects.")
+            logging.info(
+                "Lookup Key (" + lookup_key + ") not in vocabulary. Check redirects."
+            )
             if lookup_key not in self.redirects:
                 return None
             lookup_key = self.redirects[lookup_key]
-            logging.info("Lookup Key 1 redirects to: " + str(lookup_key.encode(encoding="utf-8")))
+            logging.info(
+                "Lookup Key 1 redirects to: " + str(lookup_key.encode(encoding="utf-8"))
+            )
             return lookup_key
         else:
             return lookup_key
@@ -373,12 +416,16 @@ class DBpediaQueryService:
 
 def main():
 
-    path_to_dbpedia_vectors = "/Users/janportisch/Documents/Data/KGvec2go_DBpedia_Optimized/" \
-                              "sg200_dbpedia_500_8_df_vectors_reduced.kv"
+    path_to_dbpedia_vectors = (
+        "/Users/janportisch/Documents/Data/KGvec2go_DBpedia_Optimized/"
+        "sg200_dbpedia_500_8_df_vectors_reduced.kv"
+    )
     # path_to_dbpedia_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/
     # dbpedia_entities.txt"
     path_to_dbpedia_redirects = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/redirects_en.ttl"
-    dbpedia_service = DBpediaQueryService(vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
+    dbpedia_service = DBpediaQueryService(
+        vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects
+    )
 
     print(dbpedia_service.find_closest_lemmas("Angela Merkel", 10))
 

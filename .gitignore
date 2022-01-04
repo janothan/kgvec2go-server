@@ -130,15 +130,15 @@ dmypy.json
 !requirements.txt
 *.npy
 *.out
-dbnary/dbnary_200_8/sg200_dbnary_200_8
-dbnary/dbnary_100_8/sg200_dbnary_100_8
-wordnet/wordnet_500_8/sg200_wordnet_500_8
-dbnary/dbnary_500_8_pages/sg200_dbnary_500_8_pages
+kgvec2go_server/dbnary/dbnary_200_8/sg200_dbnary_200_8
+kgvec2go_server/dbnary/dbnary_100_8/sg200_dbnary_100_8
+kgvec2go_server/wordnet/wordnet_500_8/sg200_wordnet_500_8
+kgvec2go_server/dbnary/dbnary_500_8_pages/sg200_dbnary_500_8_pages
 .idea/*
 Playground.py
 filePlayground.py
-alod/alod_500_4/*
-/alod/alod_500_4/sg200_alod_500_4
+kgvec2go_server/alod/alod_500_4/*
+/kgvec2go_server/alod/alod_500_4/sg200_alod_500_4
 sg200_wordnet_500_4_df
 sg200_babelnet_100_8_vectors
 sg200_dbnary_pages_500_4_df
@@ -153,13 +153,13 @@ sg200_wordnet_500_8_df_with_strings
 *.hdt
 
 # Exclude Models file
-/jRDF2Vec/models/*
+/kgvec2go_server/jRDF2Vec/models/*
 /melt-resources
 
 # Excplicitly include gold standard
-!gold_standards/MEN_dataset_lemma_form_full.txt
-!gold_standards/SimLex-999.txt
-!gold_standards/wordsim_similarity_goldstandard.txt
+!kgvec2go_server/gold_standards/MEN_dataset_lemma_form_full.txt
+!kgvec2go_server/gold_standards/SimLex-999.txt
+!kgvec2go_server/gold_standards/wordsim_similarity_goldstandard.txt
 
 mini_model.py
 model_shrinked.kv
@@ -175,9 +175,6 @@ sg200_alod_100_8_df_mc1_it3_vectors.kv.vectors.npy
 sg200_dbnary_500_8_df_mc1_it3_reduced_vectors.kv
 train-all-document-similarity.py
 train-all-kore.py
-
-# Logs
-*.log
 
 # Configuration
 server.conf

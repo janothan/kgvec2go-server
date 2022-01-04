@@ -8,7 +8,13 @@ class DbnaryQueryService:
 
     """
 
-    def __init__(self, entity_file='', model_file='', vector_file='', is_reduced_vector_file=False):
+    def __init__(
+        self,
+        entity_file="",
+        model_file="",
+        vector_file="",
+        is_reduced_vector_file=False,
+    ):
         """
 
         Parameters
@@ -22,11 +28,11 @@ class DbnaryQueryService:
         is_reduced_vector_file
             True if unnecessary have already been removed from the vector space (using vector_shrinker.py).
         """
-        if vector_file == '':
+        if vector_file == "":
             self.model = gensim.models.Word2Vec.load(model_file)
             self.vectors = self.model.wv
         else:
-            self.vectors = KeyedVectors.load(vector_file, mmap='r')
+            self.vectors = KeyedVectors.load(vector_file, mmap="r")
 
         self.is_reduced_vector_file = is_reduced_vector_file
         self.all_lemmas = self.__read_lemmas(entity_file)
@@ -34,7 +40,6 @@ class DbnaryQueryService:
 
         # cache for UI
         self.closest_concepts_cache = {}
-
 
     def __map_terms(self, all_lemmas):
         result = {}
@@ -56,7 +61,9 @@ class DbnaryQueryService:
             Transformed string.
         """
 
-        string_to_be_transformed = string_to_be_transformed.replace("http://kaiko.getalp.org/dbnary/eng/", "")
+        string_to_be_transformed = string_to_be_transformed.replace(
+            "http://kaiko.getalp.org/dbnary/eng/", ""
+        )
         # string_to_be_transformed = string_to_be_transformed.lower()
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
@@ -68,15 +75,18 @@ class DbnaryQueryService:
         else:
             result = []
             number_of_vocab_errors = 0
-            with open(path_to_lemma_file, errors='ignore') as lemma_file:
+            with open(path_to_lemma_file, errors="ignore") as lemma_file:
                 for lemma in lemma_file:
                     lemma = lemma.replace("\n", "").replace("\r", "")
                     if lemma not in self.vectors.vocab:
-                        print("The follwing lemma was not found in the vocabulary: " + str(lemma.encode(encoding="utf-8")))
+                        print(
+                            "The follwing lemma was not found in the vocabulary: "
+                            + str(lemma.encode(encoding="utf-8"))
+                        )
                         number_of_vocab_errors += 1
                     else:
                         result.append(lemma)
-                    #if lemma not in self.vectors.vocab:
+                    # if lemma not in self.vectors.vocab:
                     #    print(lemma + " not in vocabulary.")
             print("Dbnary lemmas read.")
             print("Number of vocabulary errors: " + str(number_of_vocab_errors))
@@ -89,7 +99,7 @@ class DbnaryQueryService:
             result_list = self.vectors.most_similar(positive=key, topn=top)
         else:
             result_list = []
-            ResultEntry = namedtuple('ResultEntry', 'concept similarity')
+            ResultEntry = namedtuple("ResultEntry", "concept similarity")
             not_found_error = 0
             for concept in self.all_lemmas:
                 try:
@@ -100,15 +110,27 @@ class DbnaryQueryService:
                     not_found_error += 1
             print("Not found keys: " + str(not_found_error))
             result_list.sort(key=self.__take_second, reverse=True)
-            result_list = result_list[:int(top)]
+            result_list = result_list[: int(top)]
         result = '{\n"result": [\n'
         is_first = True
         for entry in result_list:
             if is_first:
                 is_first = False
-                result += '{ "concept":"' + str(entry[0]) + '", "score":' + str(entry[1]) + "}"
+                result += (
+                    '{ "concept":"'
+                    + str(entry[0])
+                    + '", "score":'
+                    + str(entry[1])
+                    + "}"
+                )
             else:
-                result += ',\n{ "concept":"' + str(entry[0]) + '", "score":' + str(entry[1]) + "}"
+                result += (
+                    ',\n{ "concept":"'
+                    + str(entry[0])
+                    + '", "score":'
+                    + str(entry[1])
+                    + "}"
+                )
         result += "\n]\n}"
         return result
 
@@ -122,7 +144,9 @@ class DbnaryQueryService:
 
         result = "{}"
         if lookup_key in self.term_mapping:
-            result = self.find_closest_lemmas_given_key(key=self.term_mapping[lookup_key], top=top)
+            result = self.find_closest_lemmas_given_key(
+                key=self.term_mapping[lookup_key], top=top
+            )
 
         self.closest_concepts_cache[lookup_key] = result
         return result
@@ -136,7 +160,13 @@ class DbnaryQueryService:
         if lookup_key in self.term_mapping:
             uri = self.term_mapping[lookup_key]
             vector = self.vectors.get_vector(uri)
-            return '{ "uri": "' + uri + '",\n"vector": ' + self.__to_json_arry(vector) + '}'
+            return (
+                '{ "uri": "'
+                + uri
+                + '",\n"vector": '
+                + self.__to_json_arry(vector)
+                + "}"
+            )
         else:
             return "{}"
 
@@ -148,7 +178,7 @@ class DbnaryQueryService:
                 is_first = False
                 result += "[" + str(element)
             else:
-                result += ',' + str(element)
+                result += "," + str(element)
         return result + "]"
 
     def get_similarity(self, concept_1, concept_2):
@@ -170,12 +200,12 @@ class DbnaryQueryService:
         lookup_key_1 = self.__transform_string(concept_1)
         lookup_key_2 = self.__transform_string(concept_2)
 
-        #try:
+        # try:
         #    mapping_1 = self.term_mapping[lookup_key_1]
         #    mapping_2 = self.term_mapping[lookup_key_2]
         #    print(concept_1 + " mapped to " + str(mapping_1))
         #    print(concept_2 + " mapped to " + str(mapping_2))
-        #except KeyError:
+        # except KeyError:
         #    #not important, just logging
         #    pass
 
@@ -198,15 +228,16 @@ class DbnaryQueryService:
                     return None
 
         try:
-            similarity = self.vectors.similarity(self.term_mapping[lookup_key_1], self.term_mapping[lookup_key_2])
-            #print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
+            similarity = self.vectors.similarity(
+                self.term_mapping[lookup_key_1], self.term_mapping[lookup_key_2]
+            )
+            # print("sim(" + concept_1 + ", " + concept_2 + ") = " + str(similarity))
             return similarity
         except KeyError:
             print("KeyError: One of the following concepts not found in vocabulary.")
             print("\t " + str(self.term_mapping[lookup_key_1]))
             print("\t " + str(self.term_mapping[lookup_key_2]))
             return None
-
 
     def get_similarity_json(self, concept_1, concept_2):
         """Calculate the similarity between the two given concepts.
@@ -233,18 +264,21 @@ class DbnaryQueryService:
     def __str__(self):
         return "DBnary/Wiktionary Query Service"
 
+
 def main():
     print("Start")
-    service = DbnaryQueryService(entity_file="./dbnary_500_8_pages/dbnary_entities.txt",
-                                 model_file="./dbnary_500_8_pages/sg200_dbnary_500_8_pages")
+    service = DbnaryQueryService(
+        entity_file="./dbnary_500_8_pages/dbnary_entities.txt",
+        model_file="./dbnary_500_8_pages/sg200_dbnary_500_8_pages",
+    )
     # print(service.find_closest_lemmas_given_key('http://kaiko.getalp.org/dbnary/eng/famous', 10))
     # print(service.find_closest_lemmas('famous', 10))
     # print(service.find_closest_lemmas('dog', 10))
     # print(service.find_closest_lemmas('swap', 10))
     # print(service.find_closest_lemmas('random_bla_balc_asdef', 10))
-    #print(service.find_closest_lemmas('World Wide WEb', 10))
+    # print(service.find_closest_lemmas('World Wide WEb', 10))
     print(service.get_vector("professor"))
-    #print("End")
+    # print("End")
 
 
 if __name__ == "__main__":

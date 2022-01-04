@@ -36,8 +36,7 @@ def shrink_vectors_new(vectors, path_to_concept_file, file_to_write):
     return vectors
 
 
-
-#def shrink_vectors_old(vectors, path_to_concept_file, file_to_write):
+# def shrink_vectors_old(vectors, path_to_concept_file, file_to_write):
 #    concepts_to_be_kept = read_concept_file(path_to_concept_file)
 #    print("File with concepts that shall be kept read.")
 #
@@ -68,21 +67,32 @@ def shrink_vectors_new(vectors, path_to_concept_file, file_to_write):
 
 def read_concept_file(path_to_concept_file):
     result = []
-    with open(path_to_concept_file, errors='ignore') as concept_file:
+    with open(path_to_concept_file, errors="ignore") as concept_file:
         for lemma in concept_file:
             lemma = lemma.replace("\n", "").replace("\r", "")
             result.append(lemma)
     print("File read.")
     return result
 
+
 def test(vector_file):
-    vectors_new = shrink_vectors_new(vectors=KeyedVectors.load(vector_file, mmap='r'), path_to_concept_file="./test_keep.txt", file_to_write="./model_shrinked.kv")
-    vectors_old = KeyedVectors.load(vector_file, mmap='r')
+    vectors_new = shrink_vectors_new(
+        vectors=KeyedVectors.load(vector_file, mmap="r"),
+        path_to_concept_file="./test_keep.txt",
+        file_to_write="./model_shrinked.kv",
+    )
+    vectors_old = KeyedVectors.load(vector_file, mmap="r")
     print("Length of old vectors: " + str(len(vectors_old.vocab)))
     print("Length of new vectors: " + str(len(vectors_new.vocab)))
     print()
-    print("Europe vector same value: " + str(np.all(vectors_new["Europe"] == vectors_old["Europe"])))
-    print("United vector same value: " + str(np.all(vectors_new["united"] == vectors_old["united"])))
+    print(
+        "Europe vector same value: "
+        + str(np.all(vectors_new["Europe"] == vectors_old["Europe"]))
+    )
+    print(
+        "United vector same value: "
+        + str(np.all(vectors_new["united"] == vectors_old["united"]))
+    )
     print()
     print("Vocabulary old vectors:")
     for w in vectors_old.vocab:
@@ -101,16 +111,22 @@ def save_vector_file(path_to_model, path_to_vector_file):
 
 
 def main():
-    old_vector_file_path = './sg200_dbpedia_100_8_df_mc1_updated_vectors.kv'
-    concepts_to_keep_file_path = '/work/jportisc/Walk_Generation_dbpedia_100_8_df/cache/dbpedia_entities.txt'
-    file_to_write_file_path = './sg200_dbpedia_100_8_df_mc1_updated__reduced_vectors.kv'
+    old_vector_file_path = "./sg200_dbpedia_100_8_df_mc1_updated_vectors.kv"
+    concepts_to_keep_file_path = (
+        "/work/jportisc/Walk_Generation_dbpedia_100_8_df/cache/dbpedia_entities.txt"
+    )
+    file_to_write_file_path = "./sg200_dbpedia_100_8_df_mc1_updated__reduced_vectors.kv"
 
     # optional
-    model_file_path = './sg200_dbpedia_100_8_df_mc1_updated'
+    model_file_path = "./sg200_dbpedia_100_8_df_mc1_updated"
     save_vector_file(model_file_path, old_vector_file_path)
 
-    shrink_vectors_new(vectors=KeyedVectors.load(old_vector_file_path, mmap='r'), path_to_concept_file=concepts_to_keep_file_path, file_to_write=file_to_write_file_path)
-    #test("./test_model_vectors.kv")
+    shrink_vectors_new(
+        vectors=KeyedVectors.load(old_vector_file_path, mmap="r"),
+        path_to_concept_file=concepts_to_keep_file_path,
+        file_to_write=file_to_write_file_path,
+    )
+    # test("./test_model_vectors.kv")
     print("Done")
 
 

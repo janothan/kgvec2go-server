@@ -5,7 +5,11 @@ import gzip
 import numpy as np
 from gensim.models import KeyedVectors
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', filename='log.out', level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s : %(levelname)s : %(message)s",
+    filename="log.out",
+    level=logging.INFO,
+)
 
 
 def save_vector_file(path_to_model, path_to_vector_file):
@@ -51,11 +55,11 @@ def shrink_vectors(vectors, path_to_concept_file, file_to_write):
         if i % 10000 == 0:
             print("Finished " + str(i) + " out of " + str(len(vectors.vocab)))
         if word in concepts_to_be_kept:
-                vocab.index = len(new_index2entity)
-                new_index2entity.append(word)
-                new_vocab[word] = vocab
-                new_vectors.append(vec)
-                new_vectors_norm.append(vec_norm)
+            vocab.index = len(new_index2entity)
+            new_index2entity.append(word)
+            new_vocab[word] = vocab
+            new_vectors.append(vec)
+            new_vectors_norm.append(vec_norm)
 
     vectors.vocab = new_vocab
     vectors.vectors = np.array(new_vectors)
@@ -65,14 +69,16 @@ def shrink_vectors(vectors, path_to_concept_file, file_to_write):
     vectors.save(file_to_write)
     return vectors
 
+
 def read_concept_file(path_to_concept_file):
     result = []
-    with open(path_to_concept_file, errors='ignore') as concept_file:
+    with open(path_to_concept_file, errors="ignore") as concept_file:
         for lemma in concept_file:
             lemma = lemma.replace("\n", "").replace("\r", "")
             result.append(lemma)
     print("File read.")
     return result
+
 
 def train(path_to_sentences, file_to_write):
 
@@ -85,35 +91,38 @@ def train(path_to_sentences, file_to_write):
             for fname in os.listdir(self.dirname):
                 print("Processing file: " + fname)
                 try:
-                    for line in gzip.open(os.path.join(self.dirname, fname), mode='rt', encoding="utf-8"):
-                        line = line.rstrip('\n')
+                    for line in gzip.open(
+                        os.path.join(self.dirname, fname), mode="rt", encoding="utf-8"
+                    ):
+                        line = line.rstrip("\n")
                         words = line.split(" ")
                         yield words
                 except Exception:
                     logging.error("Failed reading file:")
                     logging.error(fname)
 
-
     logging.info("Starting Process")
 
     # init
     sentences = MySentences(path_to_sentences)
-    logging.info('Sentences Object successfully initialized.')
+    logging.info("Sentences Object successfully initialized.")
 
     # sg 200
-    model = gensim.models.Word2Vec(size=200, workers=20, window=5, sg=1, negative=25, iter=5, sentences=sentences)
-    #print('Gensim Model SG 200 initialized. Building vocabulary...')
+    model = gensim.models.Word2Vec(
+        size=200, workers=20, window=5, sg=1, negative=25, iter=5, sentences=sentences
+    )
+    # print('Gensim Model SG 200 initialized. Building vocabulary...')
 
     # Build Vocabulary
-    #model.build_vocab(sentences)
-    #print('Vocabulary successfully built.')
+    # model.build_vocab(sentences)
+    # print('Vocabulary successfully built.')
 
-    #print('Training SG 200')
-    #model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
+    # print('Training SG 200')
+    # model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
 
-    logging.info('SG 200 trained - Saving...')
+    logging.info("SG 200 trained - Saving...")
     model.save(file_to_write)
-    logging.info('SG 200 saved.')
+    logging.info("SG 200 saved.")
 
     print("Training DONE")
 
@@ -135,8 +144,11 @@ def main():
     vector_file_name = "./sg200_dbpedia_500_8_df_vectors.kv"
     path_to_concepts_file = "./dbpedia_entities.txt"
     file_to_write = "./sg200_dbpedia_500_8_df_vectors_reduced.kv"
-    shrink_vectors(KeyedVectors.load(vector_file_name, mmap='r'), path_to_concept_file=path_to_concepts_file,
-                   file_to_write=file_to_write)
+    shrink_vectors(
+        KeyedVectors.load(vector_file_name, mmap="r"),
+        path_to_concept_file=path_to_concepts_file,
+        file_to_write=file_to_write,
+    )
 
 
 if __name__ == "__main__":

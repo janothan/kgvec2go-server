@@ -6,7 +6,11 @@ import gzip
 import numpy as np
 from gensim.models import KeyedVectors
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', filename='word2vec_log.out', level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s : %(levelname)s : %(message)s",
+    filename="word2vec_log.out",
+    level=logging.INFO,
+)
 
 
 def save_vector_file(path_to_model, path_to_vector_file):
@@ -15,6 +19,7 @@ def save_vector_file(path_to_model, path_to_vector_file):
     print("Model parsed. Writing vector file: " + path_to_vector_file)
     model.wv.save(path_to_vector_file)
     print("Vector file written.")
+
 
 def shrink_vectors(vectors, path_to_concept_file, file_to_write):
     """Writes a new, reduced vector file with the given concepts.
@@ -63,14 +68,16 @@ def shrink_vectors(vectors, path_to_concept_file, file_to_write):
     vectors.save(file_to_write)
     return vectors
 
+
 def read_concept_file(path_to_concept_file):
     result = []
-    with open(path_to_concept_file, errors='ignore') as concept_file:
+    with open(path_to_concept_file, errors="ignore") as concept_file:
         for lemma in concept_file:
             lemma = lemma.replace("\n", "").replace("\r", "")
             result.append(lemma)
     print("File read.")
     return result
+
 
 def train(path_to_sentences, file_to_write):
 
@@ -83,35 +90,38 @@ def train(path_to_sentences, file_to_write):
             for fname in os.listdir(self.dirname):
                 print("Processing file: " + fname)
                 try:
-                    for line in gzip.open(os.path.join(self.dirname, fname), mode='rt', encoding="utf-8"):
-                        line = line.rstrip('\n')
+                    for line in gzip.open(
+                        os.path.join(self.dirname, fname), mode="rt", encoding="utf-8"
+                    ):
+                        line = line.rstrip("\n")
                         words = line.split(" ")
                         yield words
                 except Exception:
                     logging.error("Failed reading file:")
                     logging.error(fname)
 
-
     logging.info("Starting Process")
 
     # init
     sentences = MySentences(path_to_sentences)
-    logging.info('Sentences Object successfully initialized.')
+    logging.info("Sentences Object successfully initialized.")
 
     # sg 200
-    model = gensim.models.Word2Vec(size=200, workers=20, window=5, sg=1, negative=25, iter=5, sentences=sentences)
-    #print('Gensim Model SG 200 initialized. Building vocabulary...')
+    model = gensim.models.Word2Vec(
+        size=200, workers=20, window=5, sg=1, negative=25, iter=5, sentences=sentences
+    )
+    # print('Gensim Model SG 200 initialized. Building vocabulary...')
 
     # Build Vocabulary
-    #model.build_vocab(sentences)
-    #print('Vocabulary successfully built.')
+    # model.build_vocab(sentences)
+    # print('Vocabulary successfully built.')
 
-    #print('Training SG 200')
-    #model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
+    # print('Training SG 200')
+    # model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
 
-    logging.info('SG 200 trained - Saving...')
+    logging.info("SG 200 trained - Saving...")
     model.save(file_to_write)
-    logging.info('SG 200 saved.')
+    logging.info("SG 200 saved.")
 
     print("Training DONE")
 
@@ -133,8 +143,11 @@ def main():
     vector_file_name = ""
     path_to_concepts_file = ""
     file_to_write = ""
-    shrink_vectors(KeyedVectors.load(vector_file_name, mmap='r'), path_to_concept_file=path_to_concepts_file,
-                   file_to_write=file_to_write + "_vectors_shrinked.kv")
+    shrink_vectors(
+        KeyedVectors.load(vector_file_name, mmap="r"),
+        path_to_concept_file=path_to_concepts_file,
+        file_to_write=file_to_write + "_vectors_shrinked.kv",
+    )
 
 
 if __name__ == "__main__":

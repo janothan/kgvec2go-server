@@ -2,6 +2,7 @@ import subprocess
 import os
 import io
 
+
 class jRDF2Vec:
     """
     Class providing RDF2Vec Services
@@ -20,7 +21,9 @@ class jRDF2Vec:
         current_port = self._increment_port()
 
         # create directory
-        directory_name = self._jrdf_2_vec_directory + "models/" + str(current_port) + "/"
+        directory_name = (
+            self._jrdf_2_vec_directory + "models/" + str(current_port) + "/"
+        )
         try:
             os.makedirs(directory_name, mode=0o777)
         except OSError:
@@ -39,7 +42,7 @@ class jRDF2Vec:
         entity_file_name = directory_name + "entities.txt"
         print("Writing file: " + entity_file_name)
         try:
-            with io.open(entity_file_name, 'w', encoding='utf8') as f:
+            with io.open(entity_file_name, "w", encoding="utf8") as f:
                 text = ""
                 for entity in entities:
                     text += entity + "\n"
@@ -48,14 +51,27 @@ class jRDF2Vec:
             print("Failed wo write file '" + entity_file_name + "'")
             print("OS error: {0}".format(e))
 
-        process_result = subprocess.check_output(['java', "-jar", self._jrdf_2_vec_directory + "jRDF2Vec.jar",
-                                                  "-light", entity_file_name,
-                                                  "-graph", self._jrdf_2_vec_directory + "dbpedia_merged.hdt",
-                                                  "-numberOfWalks", str(number_of_walks),
-                                                  "-trainingMode", str(mode),
-                                                  "-dimension", str(dimension),
-                                                  "-walkDir", walk_directory_name,
-                                                  "-serverResourcesDir", self._jrdf_2_vec_directory])
+        process_result = subprocess.check_output(
+            [
+                "java",
+                "-jar",
+                self._jrdf_2_vec_directory + "jRDF2Vec.jar",
+                "-light",
+                entity_file_name,
+                "-graph",
+                self._jrdf_2_vec_directory + "dbpedia_merged.hdt",
+                "-numberOfWalks",
+                str(number_of_walks),
+                "-trainingMode",
+                str(mode),
+                "-dimension",
+                str(dimension),
+                "-walkDir",
+                walk_directory_name,
+                "-serverResourcesDir",
+                self._jrdf_2_vec_directory,
+            ]
+        )
 
         print(process_result)
 
@@ -82,4 +98,3 @@ class jRDF2Vec:
         else:
             self._port += 1
         return self._port
-
