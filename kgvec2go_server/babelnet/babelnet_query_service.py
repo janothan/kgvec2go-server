@@ -204,24 +204,24 @@ class BabelNetQueryService:
     ) -> float:
         """Calculate the similarity between the two given concepts.
 
-            Parameters
-            ----------
-            concept_1 : str
-                The first concept.
+        Parameters
+        ----------
+        concept_1 : str
+            The first concept.
 
-            concept_2 : str
-                The second concept
+        concept_2 : str
+            The second concept
 
-            pos_1 : str
-                The POS of concept_1.
+        pos_1 : str
+            The POS of concept_1.
 
-            pos_2 : str
-                The POS of concept_2.
+        pos_2 : str
+            The POS of concept_2.
 
-            Returns
-            -------
-            float
-                Similarity. If no concepts can be found: None.
+        Returns
+        -------
+        float
+            Similarity. If no concepts can be found: None.
         """
         lookup_key_1 = self.get_lookup_key(concept_1, pos_1)
         lookup_key_2 = self.get_lookup_key(concept_2, pos_2)
@@ -263,24 +263,24 @@ class BabelNetQueryService:
     ):
         """Calculate the similarity between the two given concepts.
 
-           Parameters
-           ----------
-           concept_1 : str
-               The first concept.
+        Parameters
+        ----------
+        concept_1 : str
+            The first concept.
 
-           concept_2 : str
-               The second concept.
+        concept_2 : str
+            The second concept.
 
-            pos_1 : str
-                The POS of concept_1.
+         pos_1 : str
+             The POS of concept_1.
 
-            pos_2 : str
-                The POS of concept_2.
+         pos_2 : str
+             The POS of concept_2.
 
-           Returns
-           -------
-           float
-               Similarity as JSON.
+        Returns
+        -------
+        float
+            Similarity as JSON.
         """
         similarity = self.get_similarity(concept_1, concept_2, pos_1=pos_1, pos_2=pos_2)
         if similarity is None:

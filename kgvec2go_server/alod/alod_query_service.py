@@ -138,18 +138,18 @@ class AlodQueryService:
     def get_similarity(self, concept_1: str, concept_2: str) -> float:
         """Calculate the similarity between the two given concepts.
 
-            Parameters
-            ----------
-            concept_1 : str
-                The first concept.
+        Parameters
+        ----------
+        concept_1 : str
+            The first concept.
 
-            concept_2 : str
-                The second concept
+        concept_2 : str
+            The second concept
 
-            Returns
-            -------
-            float
-                Similarity. If no concepts can be found: None.
+        Returns
+        -------
+        float
+            Similarity. If no concepts can be found: None.
         """
         lookup_key_1 = self.__transform_string(concept_1)
         lookup_key_2 = self.__transform_string(concept_2)
@@ -161,18 +161,18 @@ class AlodQueryService:
     def get_similarity_json(self, concept_1: str, concept_2: str) -> str:
         """Calculate the similarity between the two given concepts.
 
-           Parameters
-           ----------
-           concept_1 : str
-               The first concept.
+        Parameters
+        ----------
+        concept_1 : str
+            The first concept.
 
-           concept_2 : str
-               The second concept
+        concept_2 : str
+            The second concept
 
-           Returns
-           -------
-           float
-               Similarity as JSON.
+        Returns
+        -------
+        float
+            Similarity as JSON.
         """
         similarity = self.get_similarity(concept_1, concept_2)
         if similarity is None:

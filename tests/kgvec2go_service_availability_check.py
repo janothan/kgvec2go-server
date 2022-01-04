@@ -2,8 +2,7 @@ import requests
 
 
 class ServiceAvailabilityCheck:
-    """Class to check whether the server is fully functional. This class is not required to run the server.
-    """
+    """Class to check whether the server is fully functional. This class is not required to run the server."""
 
     def __init__(self, url):
         self.url = url
@@ -11,8 +10,7 @@ class ServiceAvailabilityCheck:
         self.failure_sign = "\N{cross mark} "
 
     def check_static_webpages(self):
-        """Checks all static pages and prints a success or error message to the console.
-        """
+        """Checks all static pages and prints a success or error message to the console."""
         print("Static Site Checks")
         print("------------------")
         self._check_single_page(self.url)
@@ -25,8 +23,7 @@ class ServiceAvailabilityCheck:
         print("\n")
 
     def check_get_vector(self):
-        """Checks the request: /rest/get-vector/<dataset>/<word>
-        """
+        """Checks the request: /rest/get-vector/<dataset>/<word>"""
         print("Get Vector Checks")
         print("-----------------")
         self._check_single_vector_request(self.url + "/rest/get-vector/wordnet/car")
@@ -36,8 +33,7 @@ class ServiceAvailabilityCheck:
         print("\n")
 
     def check_get_similarity(self):
-        """Checks the request: /rest/get-similarity/<dataset>/<word>/<word>
-        """
+        """Checks the request: /rest/get-similarity/<dataset>/<word>/<word>"""
         print("Similarity Checks")
         print("-----------------")
         self._check_single_similarity_request(

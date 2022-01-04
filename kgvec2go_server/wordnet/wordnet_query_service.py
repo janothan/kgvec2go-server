@@ -227,19 +227,19 @@ class WordnetQueryService:
     def get_similarity(self, concept_1, concept_2, pos_1="N", pos_2="N"):
         """Calculate the similarity between the two given concepts.
 
-            Parameters
-            ----------
-            concept_1 : str
-                The first concept.
+        Parameters
+        ----------
+        concept_1 : str
+            The first concept.
 
-            concept_2 : str
-                The second concept
+        concept_2 : str
+            The second concept
 
-            Returns
-            -------
-            float
-                Similarity. If no concepts can be found: None.
-            """
+        Returns
+        -------
+        float
+            Similarity. If no concepts can be found: None.
+        """
         lookup_key_1 = self.transform_string(concept_1)
         lookup_key_2 = self.transform_string(concept_2)
         if lookup_key_1 in self.term_mapping and lookup_key_2 in self.term_mapping:
@@ -256,19 +256,19 @@ class WordnetQueryService:
 
     def __pick_pos_vector(self, vectors, pos="n"):
         """Pick the vector out of the set of given vectors. If no vector from the given POS can be found, the first
-           vector of the given set of vectors is returned.
+        vector of the given set of vectors is returned.
 
-            Parameters
-            ----------
-            vectors : list
-                The set of vectors.
-            pos : basestring
-                Default: Noun (n). The vector to be preferred.
+         Parameters
+         ----------
+         vectors : list
+             The set of vectors.
+         pos : basestring
+             Default: Noun (n). The vector to be preferred.
 
-             Returns
-             -------
-             list
-                The resulting vector.
+          Returns
+          -------
+          list
+             The resulting vector.
         """
         pos = pos.lower()
         if pos not in ["j", "v", "n", "r", "a"]:
@@ -282,18 +282,18 @@ class WordnetQueryService:
     def get_similarity_json(self, concept_1, concept_2):
         """Calculate the similarity between the two given concepts.
 
-           Parameters
-           ----------
-           concept_1 : str
-               The first concept.
+        Parameters
+        ----------
+        concept_1 : str
+            The first concept.
 
-           concept_2 : str
-               The second concept
+        concept_2 : str
+            The second concept
 
-           Returns
-           -------
-           float
-               Similarity as JSON.
+        Returns
+        -------
+        float
+            Similarity as JSON.
         """
         similarity = self.get_similarity(concept_1, concept_2)
         if similarity is None:
