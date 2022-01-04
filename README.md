@@ -1,4 +1,6 @@
 # KGvec2go Server
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 This is the implementation of the *KGvec2go* server that powers the Web service (including the Web site): 
 <a href="http://www.kgvec2go.org/">http://www.kgvec2go.org/</a>.
 It is based on <a href="https://www.palletsprojects.com/p/flask/">flask</a> as well as 
