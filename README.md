@@ -1,5 +1,6 @@
 # KGvec2go Server
 [![Unit Tests](https://github.com/janothan/kgvec2go-server/actions/workflows/tests.yml/badge.svg)](https://github.com/janothan/kgvec2go-server/actions/workflows/tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/janothan/kgvec2go-server/badge.svg?branch=master)](https://coveralls.io/github/janothan/kgvec2go-server?branch=master)
 [![Lint](https://github.com/janothan/kgvec2go-server/actions/workflows/black.yml/badge.svg)](https://github.com/janothan/kgvec2go-server/actions/workflows/black.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
