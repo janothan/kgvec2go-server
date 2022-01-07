@@ -10,3 +10,13 @@ It is based on <a href="https://www.palletsprojects.com/p/flask/">flask</a> as w
 <!--Note that the walks were generated using project <a href="https://github.com/janothan/kgvec2go-walks">KGvec2go Walks</a>. -->
 
 Do you want to train your own RDF2Vec embeddings? We recommend using <a href="https://github.com/dwslab/jrdf2vec">jRDF2Vec</a>.
+
+
+## Development
+
+### Coding Standards
+- [black](https://github.com/psf/black) is used to format the project
+- [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) is used to document code
+
+### Administration
+- The server is started by running `flask_server.py` (an option for local testing is available via `on_local=True`).

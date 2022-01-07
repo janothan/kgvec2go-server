@@ -1,10 +1,24 @@
+from typing import Set, Dict
+
 import gensim
 from gensim.models import KeyedVectors
 import logging
 
 
 class DBpediaQueryService:
-    def __init__(self, model_file="", vector_file="", redirect_file=""):
+    def __init__(
+        self, model_file: str = "", vector_file: str = "", redirect_file: str = ""
+    ):
+        """Constructor
+
+        Parameters
+        ----------
+        model_file : str
+            The gensim model file. Alternatively, a vector_file can be provided.
+        vector_file : str
+            The gensim vector file. Alternatively, a model_file can be provided
+        redirect_file
+        """
         if vector_file != "":
             self.vectors = KeyedVectors.load(vector_file, mmap=None)
         elif model_file != "":
@@ -48,7 +62,7 @@ class DBpediaQueryService:
         logging.info("Number of redirects " + str(number_of_redirects))
         return result
 
-    def __map_terms(self, all_lemmas, redirects):
+    def __map_terms(self, all_lemmas: Set[str], redirects: Set[str]):
         """
 
         Parameters
@@ -62,7 +76,7 @@ class DBpediaQueryService:
         Returns
         -------
         dict
-            A dictionary of the form term -> uri.
+            A dictionary of the form: normalized term -> uri.
 
         """
         result = {}
@@ -75,7 +89,7 @@ class DBpediaQueryService:
         return result
 
     @staticmethod
-    def __transform_string(string_to_be_transformed):
+    def __transform_string(string_to_be_transformed: str):
         """Transforms any string for lookup, also URIs.
 
         Parameters
@@ -100,7 +114,7 @@ class DBpediaQueryService:
         string_to_be_transformed = string_to_be_transformed.replace(".", "")
         return string_to_be_transformed
 
-    def get_similarity(self, concept_1, concept_2):
+    def get_similarity(self, concept_1: str, concept_2: str):
         """Calculate the similarity between the two given concepts.
 
         Parameters
@@ -329,17 +343,18 @@ class DBpediaQueryService:
         result += "\n]\n}"
         return result
 
-    def __parse_redirects(self, path_to_redirects):
+    def __parse_redirects(self, path_to_redirects: str) -> Dict[str, str]:
         """
         Reads DBpedia redirects.
 
         Parameters
         ----------
-        path_to_redirects
+        path_to_redirects : str
+            Path to redirect file.
 
         Returns
         -------
-
+        A map from redirect_concept -> concept
         """
         result = {}
         with open(path_to_redirects, "r", encoding="utf-8") as redirects_file:

@@ -10,6 +10,7 @@ from kgvec2go_server.jRDF2Vec.jRDF2Vec import jRDF2Vec
 from kgvec2go_server.wordnet.wordnet_query_service import WordnetQueryService
 
 on_local = True
+local_port = 5001  # apple now uses 5000 for airplay
 
 if on_local:
     logging.basicConfig(
@@ -71,9 +72,9 @@ if on_local:
     path_to_dbpedia_vectors = "/Users/janportisch/Documents/Data/KGvec2go_DBpedia_Optimized/sg200_dbpedia_500_8_df_vectors_reduced.kv"
     # path_to_dbpedia_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/dbpedia_entities.txt"
     path_to_dbpedia_redirects = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/redirects_en.ttl"
-    dbpedia_service = DBpediaQueryService(
-        vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects
-    )
+    #dbpedia_service = DBpediaQueryService(
+    #    vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects
+    #)
     logging.info("DBpediaQueryService Initialized.")
 
     # dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects)
@@ -83,18 +84,18 @@ if on_local:
     logging.info("Init WordnetQueryService")
     path_to_wordnet_vectors = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/sg200_wordnet_500_8_df_mc1_it3_reduced_vectors.kv"
     path_to_wordnet_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/wordnet/wordnet_entities.txt"
-    wordnet_service = WordnetQueryService(
-        entity_file=path_to_wordnet_entities,
-        vector_file=path_to_wordnet_vectors,
-        is_reduced_vector_file=True,
-    )
+    #wordnet_service = WordnetQueryService(
+    #    entity_file=path_to_wordnet_entities,
+    #    vector_file=path_to_wordnet_vectors,
+    #    is_reduced_vector_file=True,
+    #)
     logging.info("WordnetQueryService initialized.")
 
     dbnary_service = 0
     # rdf_2_vec = jRDF2Vec()
 
     logging.info("KGvec2go Operational")
-    app.run(host="0.0.0.0", debug=False)
+    app.run(host="0.0.0.0", port=local_port, debug=False)
 
 else:
     logging.info("Using server environment.")
