@@ -62,7 +62,7 @@ class DBpediaQueryService:
         logging.info("Number of redirects " + str(number_of_redirects))
         return result
 
-    def __map_terms(self, all_lemmas: Set[str], redirects: Set[str]):
+    def __map_terms(self, all_lemmas: Set[str], redirects: Dict[str, str]):
         """
 
         Parameters
@@ -70,7 +70,7 @@ class DBpediaQueryService:
         all_lemmas : set of str
             A set of all lemmas, i.e. the vocabulary.
 
-        redirects : set of str
+        redirects : dict of str
             A set of all redirects.
 
         Returns
