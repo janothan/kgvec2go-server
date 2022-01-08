@@ -127,6 +127,7 @@ dmypy.json
 # project specific
 *.gz
 *.txt
+!kgvec2go_server/templates/robots.txt
 !requirements.txt
 *.npy
 *.out
