@@ -89,7 +89,7 @@ class DBpediaQueryService:
         return result
 
     @staticmethod
-    def __transform_string(string_to_be_transformed: str) -> str:
+    def transform_string(string_to_be_transformed: str) -> str:
         """Transforms any string for lookup, also URIs.
 
         Parameters
@@ -103,9 +103,12 @@ class DBpediaQueryService:
             Transformed string.
         """
         string_to_be_transformed = string_to_be_transformed.replace("dbr:", "")
+        string_to_be_transformed = string_to_be_transformed.replace(
+            "http://dbpedia.org/resource/", ""
+        )
         string_to_be_transformed = string_to_be_transformed.replace("dbo:", "")
         string_to_be_transformed = string_to_be_transformed.replace(
-            "http://dbpedia.org/ontology/:", ""
+            "http://dbpedia.org/ontology/", ""
         )
         string_to_be_transformed = string_to_be_transformed.strip(" ")
         string_to_be_transformed = string_to_be_transformed.replace(" ", "_")
