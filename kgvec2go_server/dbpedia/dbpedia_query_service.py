@@ -62,7 +62,7 @@ class DBpediaQueryService:
         logging.info("Number of redirects " + str(number_of_redirects))
         return result
 
-    def __map_terms(self, all_lemmas: Set[str], redirects: Dict[str, str]):
+    def __map_terms(self, all_lemmas: Set[str], redirects: Dict[str, str]) -> Dict[str, str]:
         """
 
         Parameters
@@ -89,7 +89,7 @@ class DBpediaQueryService:
         return result
 
     @staticmethod
-    def __transform_string(string_to_be_transformed: str):
+    def __transform_string(string_to_be_transformed: str) -> str:
         """Transforms any string for lookup, also URIs.
 
         Parameters

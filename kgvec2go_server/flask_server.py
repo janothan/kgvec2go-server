@@ -104,10 +104,10 @@ else:
     logging.info("Using server environment.")
 
     # DBpedia linux
-    path_to_dbpedia_vectors = "/disk/dbpedia/sg200_dbpedia_500_8_df_vectors_reduced.kv"
-    path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
+    path_to_dbpedia_vectors = "/disk/dbpedia/api_vectors/v2/model.kv"
+    #path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
     dbpedia_service = DBpediaQueryService(
-        vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects
+        vector_file=path_to_dbpedia_vectors, redirect_file=""
     )
     logging.info("DBpedia service initiated.")
 
