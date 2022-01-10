@@ -105,7 +105,7 @@ else:
 
     # DBpedia linux
     path_to_dbpedia_vectors = "/disk/dbpedia/api_vectors/v2/model.kv"
-    #path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
+    # path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
     dbpedia_service = DBpediaQueryService(
         vector_file=path_to_dbpedia_vectors, redirect_file=""
     )

@@ -8,6 +8,4 @@ class TestDBpediaQueryService:
         assert "European_Union" == DBPService.transform_string(
             "http://dbpedia.org/resource/European_Union"
         )
-        assert "European_Union" == DBPService.transform_string(
-            "dbr:European_Union"
-        )
+        assert "European_Union" == DBPService.transform_string("dbr:European_Union")

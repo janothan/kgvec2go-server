@@ -62,7 +62,9 @@ class DBpediaQueryService:
         logging.info("Number of redirects " + str(number_of_redirects))
         return result
 
-    def __map_terms(self, all_lemmas: Set[str], redirects: Dict[str, str]) -> Dict[str, str]:
+    def __map_terms(
+        self, all_lemmas: Set[str], redirects: Dict[str, str]
+    ) -> Dict[str, str]:
         """
 
         Parameters
@@ -81,10 +83,10 @@ class DBpediaQueryService:
         """
         result = {}
         for uri in all_lemmas:
-            lookup_key = self.__transform_string(uri)
+            lookup_key = self.transform_string(uri)
             result[lookup_key] = uri
         for uri in redirects:
-            lookup_key = self.__transform_string(uri)
+            lookup_key = self.transform_string(uri)
             result[lookup_key] = uri
         return result
 
@@ -133,8 +135,8 @@ class DBpediaQueryService:
         float
             Similarity. If no concepts can be found: None.
         """
-        lookup_key_1 = self.__transform_string(concept_1)
-        lookup_key_2 = self.__transform_string(concept_2)
+        lookup_key_1 = self.transform_string(concept_1)
+        lookup_key_2 = self.transform_string(concept_2)
 
         # try:
         #    mapping_1 = self.term_mapping[lookup_key_1]
@@ -242,11 +244,11 @@ class DBpediaQueryService:
             A JSON message of the most related concepts.
         """
         logging.info("Closest lemma query for " + lemma + " received.")
-        lookup_key = self.__transform_string(lemma)
+        lookup_key = self.transform_string(lemma)
         logging.info(("Transformed to " + lookup_key))
 
         if lookup_key in self.closest_concepts_cache:
-            logging.info(("Serve answer from cache."))
+            logging.info("Serve answer from cache.")
             return self.closest_concepts_cache[lookup_key]
 
         if lookup_key in self.term_mapping:
@@ -267,8 +269,8 @@ class DBpediaQueryService:
         """For sorting."""
         return element[1]
 
-    def get_vector(self, lemma):
-        lookup_key = self.__transform_string(lemma)
+    def get_vector(self, lemma) -> str:
+        lookup_key = self.transform_string(lemma)
         if lookup_key in self.term_mapping:
             uri = self.term_mapping[lookup_key]
 
@@ -299,7 +301,7 @@ class DBpediaQueryService:
                 result += "," + str(element)
         return result + "]"
 
-    def find_closest_lemmas_given_key(self, key: str, topn: int):
+    def find_closest_lemmas_given_key(self, key: str, topn: int) -> str:
         """Closest match operation.
 
         Parameters
@@ -321,8 +323,8 @@ class DBpediaQueryService:
             return None
 
         logging.info(("Execute most similar operation (gensim) for key: " + key + "."))
-        result_list = self.vectors.similar_by_word(key, topn=topn)
-        logging.info(("Operation completed."))
+        result_list = self.vectors.most_similar(key, topn=topn)
+        logging.info("Operation completed.")
         result = '{\n"result": [\n'
         is_first = True
         for entry in list(result_list):
@@ -398,7 +400,7 @@ class DBpediaQueryService:
         return result
 
     def __link_term(self, term) -> str:
-        normalized_term = self.__transform_string(term)
+        normalized_term = self.transform_string(term)
 
         lookup_key = None
         if normalized_term not in self.term_mapping:
@@ -430,47 +432,3 @@ class DBpediaQueryService:
 
     def __str__(self):
         return "DBpedia Query Service"
-
-
-def main():
-
-    path_to_dbpedia_vectors = (
-        "/Users/janportisch/Documents/Data/KGvec2go_DBpedia_Optimized/"
-        "sg200_dbpedia_500_8_df_vectors_reduced.kv"
-    )
-    # path_to_dbpedia_entities = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/
-    # dbpedia_entities.txt"
-    path_to_dbpedia_redirects = "/Users/janportisch/Documents/PhD/LREC_2020/Language_Models/dbpedia/redirects_en.ttl"
-    dbpedia_service = DBpediaQueryService(
-        vector_file=path_to_dbpedia_vectors, redirect_file=path_to_dbpedia_redirects
-    )
-
-    print(dbpedia_service.find_closest_lemmas("Angela Merkel", 10))
-
-    """
-    path_to_dbpedia_vectors = "/Users/janportisch/Documents/Language_Models/dbpedia/sg200_dbpedia_500_8_df_vectors.kv"
-    path_to_dbpedia_entities = "/Users/janportisch/Documents/Language_Models/dbpedia/dbpedia_entities.txt"
-    path_to_dbpedia_redirects = "/Users/janportisch/Documents/Research/DBpedia/redirects_en.ttl"
-    # dbpedia_service = 0
-    dbpedia_service = DBpediaQueryService(entity_file=path_to_dbpedia_entities, vector_file=path_to_dbpedia_vectors,
-                                          redirect_file=path_to_dbpedia_redirects)
-    print("Load complete. Run query.")
-    for key, sim in dbpedia_service.analogy("Berlin", "Germany", "Paris"):
-        print(str(key) + "   " + str(sim))
-
-    for key, sim in dbpedia_service.analogy("Germany", "Europe", "China"):
-        print(str(key) + "   " + str(sim))
-
-    for key, sim in dbpedia_service.analogy("Merkel", "Germany", "France"):
-        print(str(key) + "   " + str(sim))
-
-    for key, sim in dbpedia_service.analogy("Ludwig van Beethoven", "Bonn", "Johann Sebastian Bach"):
-        print(str(key) + "   " + str(sim))
-
-    for key, sim in dbpedia_service.analogy("Ludwig van Beethoven", "Bonn", "Bill Clinton"):
-        print(str(key) + "   " + str(sim))
-    """
-
-
-if __name__ == "__main__":
-    main()
