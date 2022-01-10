@@ -2,7 +2,10 @@ import requests
 
 
 class ServiceAvailabilityCheck:
-    """Class to check whether the server is fully functional. This class is not required to run the server."""
+    """Class to check whether the server is fully functional. This class is not required to run the server.
+    This class is (on purpose!) not a real pytest (no assert statements). The main method tests whether the
+    APIs are working on the server.
+    """
 
     def __init__(self, url):
         self.url = url
