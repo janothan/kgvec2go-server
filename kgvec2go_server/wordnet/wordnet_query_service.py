@@ -111,7 +111,7 @@ class WordnetQueryService:
         Parameters
         ----------
         lemma : str
-            Lemma for which closest lemmas shall be obtained.
+            Lemma for which the closest lemmas shall be obtained.
 
         top : str
             Top N most related concepts. Will be casted to int.
@@ -183,7 +183,7 @@ class WordnetQueryService:
         """For sorting."""
         return element[1]
 
-    def get_vector(self, lemma):
+    def get_vector(self, lemma: str) -> str:
         lookup_key = self.transform_string(lemma)
         result = '{ "result": ['
         is_first = True

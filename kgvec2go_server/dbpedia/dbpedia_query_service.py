@@ -3,6 +3,7 @@ from typing import Set, Dict
 import gensim
 from gensim.models import KeyedVectors
 import logging
+from typing import Union
 
 
 class DBpediaQueryService:
@@ -119,7 +120,7 @@ class DBpediaQueryService:
         string_to_be_transformed = string_to_be_transformed.replace(".", "")
         return string_to_be_transformed
 
-    def get_similarity(self, concept_1: str, concept_2: str):
+    def get_similarity(self, concept_1: str, concept_2: str) -> Union[float, None]:
         """Calculate the similarity between the two given concepts.
 
         Parameters
@@ -204,7 +205,7 @@ class DBpediaQueryService:
             logging.error("\t " + str(lookup_key_2.encode(encoding="utf-8")))
             return None
 
-    def get_similarity_json(self, concept_1, concept_2):
+    def get_similarity_json(self, concept_1: str, concept_2: str) -> str:
         """Calculate the similarity between the two given concepts.
 
         Parameters
@@ -217,7 +218,7 @@ class DBpediaQueryService:
 
         Returns
         -------
-        float
+        str
             Similarity as JSON.
         """
         similarity = self.get_similarity(concept_1, concept_2)
