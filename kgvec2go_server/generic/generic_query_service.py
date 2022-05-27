@@ -1,29 +1,31 @@
 from gensim.models import KeyedVectors
 from pathlib import Path
 import logging
-from typing import Union
+from typing import Union, List, Tuple
+
+from numpy import ndarray
 
 from kgvec2go_server.generic.generic_linker import GenericLinker
 
 
 class GenericKvQueryService:
-    """A class that can provide any backend service given a KV file.
-    """
+    """A class that can provide any backend service given a KV file."""
 
-    def __init__(
-            self, kv: KeyedVectors, linker: GenericLinker
-    ):
-        #logging.info(f"Loading kv file {kv_path}")
-        #self.kv: KeyedVectors = KeyedVectors.load(kv_path, mmap='r')
+    def __init__(self, kv: KeyedVectors, linker: GenericLinker):
         self.kv = kv
         self.linker = linker
 
-    def get_vector_json(self, label: str) -> str:
+    def get_vector(self, label: str) -> Union[Tuple[str, ndarray], None]:
         link: str = self.linker.link(label=label)
         if link is None:
+            return None
+        return link, self.kv[link]
+
+    def get_vector_json(self, label: str) -> str:
+        link_vector: Union[Tuple[str, ndarray], None] = self.get_vector(label=label)
+        if link_vector is None:
             return "{}"
-        vector = self.kv[link]
-        result = f'{{ "uri": "{link}", "vector": {GenericKvQueryService.__to_json_array(vector=vector)}}}'
+        result = f'{{ "uri": "{link_vector[0]}", "vector": {GenericKvQueryService.__to_json_array(vector=link_vector[1])}}}'
         return result
 
     def get_similarity(self, label_1: str, label_2: str) -> Union[float, None]:
