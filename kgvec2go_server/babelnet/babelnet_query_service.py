@@ -26,10 +26,14 @@ class BabelNetQueryService:
         elif vector_file != "":
             try:
                 vector_file_path = get_tmpfile(self.__get_file_name(vector_file))
-                self.word_vectors: KeyedVectors = KeyedVectors.load(vector_file_path, mmap="r")
+                self.word_vectors: KeyedVectors = KeyedVectors.load(
+                    vector_file_path, mmap="r"
+                )
             except FileNotFoundError:
                 vector_file_path = vector_file
-                self.word_vectors: KeyedVectors = KeyedVectors.load(vector_file_path, mmap="r")
+                self.word_vectors: KeyedVectors = KeyedVectors.load(
+                    vector_file_path, mmap="r"
+                )
 
     def __map_terms(self, all_lemmas):
         result = {}

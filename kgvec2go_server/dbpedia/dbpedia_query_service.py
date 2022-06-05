@@ -21,10 +21,10 @@ class DBpediaQueryService:
         redirect_file
         """
         if vector_file != "":
-            self.vectors = KeyedVectors.load(vector_file, mmap=None)
+            self.vectors: KeyedVectors = KeyedVectors.load(vector_file, mmap=None)
         elif model_file != "":
             self.model = gensim.models.Word2Vec.load(model_file)
-            self.vectors = self.model.wv
+            self.vectors: KeyedVectors = self.model.wv
         else:
             logging.error("ERROR - a model or vector file needs to be specified.")
 
@@ -38,7 +38,7 @@ class DBpediaQueryService:
         # self.all_lemmas = self.__read_lemmas(entity_file)
 
         # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
-        self.term_mapping = self.__map_terms(self.vectors.key_to_index, self.redirects)
+        self.term_mapping = self.__map_terms(self.vectors, self.redirects)
 
         # cache init
         self.closest_concepts_cache = {}
