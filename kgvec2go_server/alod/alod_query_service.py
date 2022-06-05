@@ -48,14 +48,14 @@ class AlodQueryService:
 
     def __read_lemmas(self):
         result = {}
-        for entry in self.word_vectors.vocab:
+        for entry in self.word_vectors:
             result[self.__transform_string(entry)] = entry
         print("ALOD Classic lemmas read.")
         return result
 
     def find_closest_lemmas_given_key(self, key, top):
 
-        if key not in self.word_vectors.vocab:
+        if key not in self.word_vectors:
             return None
 
         result = '{\n"result": [\n'

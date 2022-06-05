@@ -69,14 +69,14 @@ class DbnaryQueryService:
 
     def __read_lemmas(self, path_to_lemma_file):
         if self.is_reduced_vector_file:
-            return self.vectors.key_to_index
+            return self.vectors
         else:
             result = []
             number_of_vocab_errors = 0
             with open(path_to_lemma_file, errors="ignore") as lemma_file:
                 for lemma in lemma_file:
                     lemma = lemma.replace("\n", "").replace("\r", "")
-                    if lemma not in self.vectors.key_to_index:
+                    if lemma not in self.vectors:
                         print(
                             "The follwing lemma was not found in the vocabulary: "
                             + str(lemma.encode(encoding="utf-8"))
@@ -91,7 +91,7 @@ class DbnaryQueryService:
             return result
 
     def find_closest_lemmas_given_key(self, key, top):
-        if key not in self.vectors.key_to_index:
+        if key not in self.vectors:
             return None
         if self.is_reduced_vector_file:
             result_list = self.vectors.most_similar(positive=key, topn=top)

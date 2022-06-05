@@ -26,10 +26,10 @@ class BabelNetQueryService:
         elif vector_file != "":
             try:
                 vector_file_path = get_tmpfile(self.__get_file_name(vector_file))
-                self.word_vectors = KeyedVectors.load(vector_file_path, mmap="r")
+                self.word_vectors: KeyedVectors = KeyedVectors.load(vector_file_path, mmap="r")
             except FileNotFoundError:
                 vector_file_path = vector_file
-                self.word_vectors = KeyedVectors.load(vector_file_path, mmap="r")
+                self.word_vectors: KeyedVectors = KeyedVectors.load(vector_file_path, mmap="r")
 
     def __map_terms(self, all_lemmas):
         result = {}
@@ -135,7 +135,7 @@ class BabelNetQueryService:
         return result
 
     def find_closest_lemmas_given_key(self, key, top):
-        if key not in self.word_vectors.key_to_index:
+        if key not in self.word_vectors:
             return None
         result_list = []
         ResultEntry = namedtuple("ResultEntry", "concept similarity")
