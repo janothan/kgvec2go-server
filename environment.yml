@@ -7,6 +7,6 @@ dependencies:
   - numpy>=1.18.1
   - requests==2.23.0
   - scipy==1.4.1
-  - pip
+  - pip:
     - gensim==4.2.0
 
