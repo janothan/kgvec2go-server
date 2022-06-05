@@ -103,6 +103,13 @@ if on_local:
 else:
     logging.info("Using server environment.")
 
+    # ALOD
+    path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
+
+    # alod_service = 0
+    alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
+    logging.info("ALOD service initiated.")
+
     # DBpedia linux
     path_to_dbpedia_vectors = "/disk/dbpedia/api_vectors/v2/model.kv"
     # path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
@@ -110,13 +117,6 @@ else:
         vector_file=path_to_dbpedia_vectors, redirect_file=""
     )
     logging.info("DBpedia service initiated.")
-
-    # ALOD
-    path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
-
-    # alod_service = 0
-    alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
-    logging.info("ALOD service initiated.")
 
     # DBnary / Wiktionary
     path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"

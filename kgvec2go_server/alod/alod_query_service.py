@@ -18,7 +18,7 @@ class AlodQueryService:
             # self.model.wv.save(vector_file)
             self.word_vectors = self.model.wv
         elif vector_file != "":
-            self.word_vectors = KeyedVectors.load(vector_file, mmap="r")
+            self.word_vectors: KeyedVectors = KeyedVectors.load(vector_file, mmap="r")
 
         self.all_lemmas = self.__read_lemmas()
 
@@ -48,14 +48,14 @@ class AlodQueryService:
 
     def __read_lemmas(self):
         result = {}
-        for entry in self.word_vectors:
+        for entry in self.word_vectors.key_to_index:
             result[self.__transform_string(entry)] = entry
         print("ALOD Classic lemmas read.")
         return result
 
     def find_closest_lemmas_given_key(self, key, top):
 
-        if key not in self.word_vectors:
+        if key not in self.word_vectors.key_to_index:
             return None
 
         result = '{\n"result": [\n'
