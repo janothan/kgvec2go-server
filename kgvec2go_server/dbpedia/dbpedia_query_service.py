@@ -38,7 +38,7 @@ class DBpediaQueryService:
         # self.all_lemmas = self.__read_lemmas(entity_file)
 
         # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
-        self.term_mapping = self.__map_terms(self.vectors, self.redirects)
+        self.term_mapping = self.__map_terms(self.vectors.key_to_index, self.redirects)
 
         # cache init
         self.closest_concepts_cache = {}
