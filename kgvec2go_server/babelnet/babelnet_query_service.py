@@ -135,7 +135,7 @@ class BabelNetQueryService:
         return result
 
     def find_closest_lemmas_given_key(self, key, top):
-        if key not in self.word_vectors.vocab:
+        if key not in self.word_vectors.key_to_index:
             return None
         result_list = []
         ResultEntry = namedtuple("ResultEntry", "concept similarity")

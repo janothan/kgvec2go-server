@@ -22,7 +22,7 @@ class AlodQueryService:
 
         self.all_lemmas = self.__read_lemmas()
 
-        # cache for closests concepts
+        # cache for closest concepts
         self.closest_concepts_cache = {}
 
     def __transform_string(self, string_to_be_transformed: str) -> str:

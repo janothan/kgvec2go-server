@@ -38,7 +38,7 @@ class DBpediaQueryService:
         # self.all_lemmas = self.__read_lemmas(entity_file)
 
         # term mapping example entry: sleep -> {bn:sleep_n_EN, bn:sleep_v_EN, bn:Sleep_n_EN}
-        self.term_mapping = self.__map_terms(self.vectors.vocab, self.redirects)
+        self.term_mapping = self.__map_terms(self.vectors.key_to_index, self.redirects)
 
         # cache init
         self.closest_concepts_cache = {}
@@ -50,7 +50,7 @@ class DBpediaQueryService:
         with open(entity_file_path, errors="ignore") as lemma_file:
             for lemma in lemma_file:
                 lemma = lemma.replace("\n", "")
-                if lemma not in self.vectors.vocab:
+                if lemma not in self.vectors.key_to_index:
                     if lemma not in self.redirects:
                         # print("Could not find DBpedia concept: " + lemma)
                         number_of_key_errors += 1
@@ -171,7 +171,7 @@ class DBpediaQueryService:
 
         try:
             # handling redirects
-            if lookup_key_1 not in self.vectors.vocab:
+            if lookup_key_1 not in self.vectors.key_to_index:
                 logging.info(
                     "Lookup Key 1 ("
                     + lookup_key_1
@@ -182,7 +182,7 @@ class DBpediaQueryService:
                     "Lookup Key 1 redirects to: "
                     + str(lookup_key_1.encode(encoding="utf-8"))
                 )
-            if lookup_key_2 not in self.vectors.vocab:
+            if lookup_key_2 not in self.vectors.key_to_index:
                 logging.info(
                     "Lookup Key 2 ("
                     + lookup_key_2
@@ -319,7 +319,7 @@ class DBpediaQueryService:
             A JSON message of the most related concepts.
 
         """
-        if key not in self.vectors.vocab:
+        if key not in self.vectors.key_to_index:
             logging.info(("Key " + str(key) + " not in vocab."))
             return None
 
@@ -417,7 +417,7 @@ class DBpediaQueryService:
         else:
             lookup_key = self.term_mapping[normalized_term]
 
-        if lookup_key not in self.vectors.vocab:
+        if lookup_key not in self.vectors.key_to_index:
             logging.info(
                 "Lookup Key (" + lookup_key + ") not in vocabulary. Check redirects."
             )
