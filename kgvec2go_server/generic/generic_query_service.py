@@ -2,10 +2,13 @@ from gensim.models import KeyedVectors
 from pathlib import Path
 import logging
 from typing import Union, List, Tuple
-
+import sys
 from numpy import ndarray
 
 from kgvec2go_server.generic.generic_linker import GenericLinker
+
+# logging
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 
 class GenericKvQueryService:

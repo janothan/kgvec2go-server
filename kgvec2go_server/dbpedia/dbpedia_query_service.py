@@ -4,7 +4,10 @@ import gensim
 from gensim.models import KeyedVectors
 import logging
 from typing import Union
+import sys
 
+# logging
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 class DBpediaQueryService:
     def __init__(
