@@ -3,8 +3,10 @@ channels:
   - defaults
 dependencies:
   - python=3.8
-  - gensim==4.2.0
   - flask>=1.1.1
   - numpy>=1.18.1
   - requests==2.23.0
   - scipy==1.4.1
+  - pip
+    - gensim==4.2.0
+
