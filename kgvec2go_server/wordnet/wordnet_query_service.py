@@ -57,7 +57,7 @@ class WordnetQueryService:
         with open(path_to_lemma_file, errors="ignore") as lemma_file:
             for lemma in lemma_file:
                 lemma = lemma.replace("\n", "")
-                if lemma in self.vectors.vocab:
+                if lemma in self.vectors.key_to_index:
                     result.append(lemma)
                 else:
                     print("The following lemma was not found in vocab: " + lemma)
@@ -67,7 +67,7 @@ class WordnetQueryService:
         return result
 
     def find_closest_lemmas_given_key(self, key, top):
-        if key not in self.model.wv.vocab:
+        if key not in self.model.wv.key_to_index:
             return None
         result = '{\n"result": [\n'
         if self.is_reduced_vector_file:

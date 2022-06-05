@@ -103,32 +103,7 @@ if on_local:
 else:
     logging.info("Using server environment.")
 
-    # ALOD
-    path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
-
-    # alod_service = 0
-    alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
-    logging.info("ALOD service initiated.")
-
-    # DBpedia linux
-    path_to_dbpedia_vectors = "/disk/dbpedia/api_vectors/v2/model.kv"
-    # path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
-    dbpedia_service = DBpediaQueryService(
-        vector_file=path_to_dbpedia_vectors, redirect_file=""
-    )
-    logging.info("DBpedia service initiated.")
-
-    # DBnary / Wiktionary
-    path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
-    path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
-
-    # dbnary_service = 0
-    dbnary_service = DbnaryQueryService(
-        entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors
-    )
-    logging.info("Wiktionary service initiated.")
-
-    # WordNet
+    # ~~~ WordNet ~~~
     path_to_wordnet_model = "/disk/wordnet/sg200_wordnet_100_8_df_mc1_it3"
     path_to_wordnet_entities = "/disk/wordnet/wordnet_entities.txt"
 
@@ -139,6 +114,31 @@ else:
         is_reduced_vector_file=False,
     )
     logging.info("WordNet service initiated.")
+
+    # ~~~ ALOD ~~~
+    path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
+
+    # alod_service = 0
+    alod_service = AlodQueryService(vector_file=path_to_alod_vectors)
+    logging.info("ALOD service initiated.")
+
+    # ~~~ DBpedia ~~~
+    path_to_dbpedia_vectors = "/disk/dbpedia/api_vectors/v2/model.kv"
+    # path_to_dbpedia_redirects = "/disk/dbpedia/redirects_en.ttl"
+    dbpedia_service = DBpediaQueryService(
+        vector_file=path_to_dbpedia_vectors, redirect_file=""
+    )
+    logging.info("DBpedia service initiated.")
+
+    # ~~~ DBnary / Wiktionary ~~~
+    path_to_dbnary_vectors = "/disk/dbnary/sg200_dbnary_100_8_df_mc1_it3_vectors.kv"
+    path_to_dbnary_entities = "/disk/dbnary/dbnary_entities.txt"
+
+    # dbnary_service = 0
+    dbnary_service = DbnaryQueryService(
+        entity_file=path_to_dbnary_entities, vector_file=path_to_dbnary_vectors
+    )
+    logging.info("Wiktionary service initiated.")
 
     rdf_2_vec = jRDF2Vec(
         jrdf_2_vec_directory="/mnt/disk/server/EmbeddingServer/jRDF2Vec/"
