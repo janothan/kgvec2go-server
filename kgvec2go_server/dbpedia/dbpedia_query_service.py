@@ -9,6 +9,7 @@ import sys
 # logging
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
+
 class DBpediaQueryService:
     def __init__(
         self, model_file: str = "", vector_file: str = "", redirect_file: str = ""

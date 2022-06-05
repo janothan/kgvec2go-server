@@ -8,6 +8,7 @@ import sys
 # logging
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
+
 class AlodQueryService:
     def __init__(self, model_file="", vector_file=""):
         if model_file == "" and vector_file == "":
