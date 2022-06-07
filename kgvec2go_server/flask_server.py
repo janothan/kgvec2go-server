@@ -147,6 +147,28 @@ else:
     )
     logging.info("WordNet service initiated.")
 
+    # ~~~ TransE ~~~
+    transe_dbpedia_vectors_path = "/disk/dbpedia/transe/v1/transeL2-all-dbpedia.kv"
+
+    # load transE vectors
+    transe_dbpedia_vectors: KeyedVectors = KeyedVectors.load(
+        transe_dbpedia_vectors_path, mmap="r"
+    )
+
+    transe_linker: GenericDBpediaLinker = GenericDBpediaLinker(
+        kv=transe_dbpedia_vectors
+    )
+    transe_service: GenericKvQueryService = GenericKvQueryService(
+        kv=transe_dbpedia_vectors,
+        linker=transe_linker,
+        dataset="DBpedia",
+        dataset_version="2021-09",
+        model="transe",
+        model_version="v1",
+    )
+
+    generic_services.append(transe_service)
+
     # ~~~ ALOD ~~~
     path_to_alod_vectors = "/disk/alod/sg200_alod_100_8_df_mc1_it3_vectors.kv"
 
