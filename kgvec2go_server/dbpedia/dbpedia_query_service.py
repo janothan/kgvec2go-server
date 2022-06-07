@@ -231,7 +231,7 @@ class DBpediaQueryService:
         else:
             return '{ "result" : ' + str(similarity) + " }"
 
-    def find_closest_lemmas(self, lemma, top):
+    def find_closest_lemmas(self, lemma: str, top: str):
         """Find the closest concepts and return them as JSON message. The concept lemmas are returned rather than
         the concept URIs.
 
@@ -240,8 +240,8 @@ class DBpediaQueryService:
         lemma : str
             The lemma for which the most related concepts shall be determined.
 
-        top : int
-            The number of most related concepts to be returned.
+        top : str
+            The number of most related concepts to be returned. Integer as string.
 
         Returns
         -------

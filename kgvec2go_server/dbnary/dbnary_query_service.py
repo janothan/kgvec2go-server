@@ -1,6 +1,7 @@
 import gensim
 from collections import namedtuple
 from gensim.models import KeyedVectors
+from typing import Union
 
 
 class DbnaryQueryService:
@@ -90,7 +91,7 @@ class DbnaryQueryService:
             print("Number of vocabulary errors: " + str(number_of_vocab_errors))
             return result
 
-    def find_closest_lemmas_given_key(self, key, top):
+    def find_closest_lemmas_given_key(self, key, top) -> Union[None, str]:
         if key not in self.vectors:
             return None
         if self.is_reduced_vector_file:

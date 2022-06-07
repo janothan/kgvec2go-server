@@ -15,7 +15,28 @@ def setup_module(module):
     global qs
     kv = KeyedVectors.load("./tests/data/dbpedia_sample_vectors.kv", mmap="r")
     linker = GenericDBpediaLinker(kv=kv)
-    qs = GenericKvQueryService(kv=kv, linker=linker)
+    qs = GenericKvQueryService(
+        kv=kv,
+        linker=linker,
+        dataset="TD",
+        dataset_version="TDV",
+        model="TM",
+        model_version="TMV",
+    )
+
+
+def test_get_service_from_list():
+    my_list = [qs]
+    assert (
+        GenericKvQueryService.get_service_from_list(
+            my_list,
+            dataset="td",
+            dataset_version="td-v",
+            model="tm",
+            model_version="tmv",
+        )
+        is not None
+    )
 
 
 def test_get_vector():
