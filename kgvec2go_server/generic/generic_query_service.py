@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from gensim import matutils
 from gensim.models import KeyedVectors
 import logging
 from typing import Union, List, Tuple
 import sys
-from numpy import ndarray
+from numpy import ndarray, dot
 
 from kgvec2go_server.generic.generic_linker import GenericLinker
 
@@ -145,9 +146,52 @@ class GenericKvQueryService:
             self.get_closest_concepts(label=label, topn=topn)
         )
 
+    def get_triple_score(
+        self, subject_label: str, predicate_label: str, object_label: str
+    ) -> Union[None, float]:
+        subject_link: str = self.linker.link(label=subject_label)
+        predicate_link: str = self.linker.link(label=predicate_label)
+        object_link: str = self.linker.link(label=object_label)
+        if subject_link is None or predicate_link is None or object_link is None:
+            return None
+        subject_vector = self.kv.get_vector(key=subject_link)
+        predicate_vector = self.kv.get_vector(key=predicate_link)
+        object_vector = self.kv.get_vector(key=object_link)
+        lookup_vector = subject_vector + predicate_vector
+
+        # this is the code of the similarity function of gensim (which cannot be used since we do not want
+        # a key lookup but a direct calculation with vectors.
+        return dot(matutils.unitvec(lookup_vector), matutils.unitvec(object_vector))
+
+    def get_triple_score_json(
+        self, subject_label: str, predicate_label: str, object_label: str
+    ):
+        score = self.get_triple_score(
+            subject_label=subject_label,
+            predicate_label=predicate_label,
+            object_label=object_label,
+        )
+        if score is None:
+            return "{}"
+        else:
+            return '{ "result" : ' + str(score) + " }"
+
     def most_similar_addition(
         self, label_1: str, label_2: str, topn: int
     ) -> Union[None, List[Tuple[str, float]]]:
+        """Method for typical link prediction, i.e., adding two vectors and retrieving the closest one.
+
+        Parameters
+        ----------
+        label_1: str
+        label_2: str
+        topn: int
+
+        Returns
+        -------
+        List[Tuple[str, float]]]
+        Topn closest concepts and scores (list of tuples). None if the labels cannot be linked to concepts.
+        """
         link_1: str = self.linker.link(label=label_1)
         link_2: str = self.linker.link(label=label_2)
         if link_1 is None or link_2 is None:

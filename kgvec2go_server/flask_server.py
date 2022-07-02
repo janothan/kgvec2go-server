@@ -327,10 +327,41 @@ def closest_concepts_legacy(data_set, top_n, concept_name) -> Union[None, str]:
 
 
 @app.route(
+    "/rest/v2/get-vector/<dataset>/<dataset_version>/<model>/<model_version>/<subject>/<predicate>/<object>",
+    methods=["GET"],
+)
+def get_triple_score(
+    dataset: str,
+    dataset_version: str,
+    model: str,
+    model_version: str,
+    subject: str,
+    predicate: str,
+    object: str,
+) -> str:
+    service = GenericKvQueryService.get_service_from_list(
+        the_list=generic_services,
+        dataset=dataset,
+        dataset_version=dataset_version,
+        model=model,
+        model_version=model_version,
+    )
+    if service is None:
+        logging.error(
+            f"No embedding configuration found for: {dataset}/{dataset_version}/{model}/{model_version}"
+        )
+        return '{"error": "No embedding found for model/dataset combination."}'
+    else:
+        return service.get_triple_score_json(
+            subject_label=subject, predicate_label=predicate, object_label=object
+        )
+
+
+@app.route(
     "/rest/v2/get-vector/<dataset>/<dataset_version>/<model>/<model_version>/<concept_name>",
     methods=["GET"],
 )
-def get_vector(dataset, dataset_version, model, model_version, concept_name):
+def get_vector(dataset, dataset_version, model, model_version, concept_name) -> str:
     service = GenericKvQueryService.get_service_from_list(
         the_list=generic_services,
         dataset=dataset,
@@ -379,7 +410,7 @@ def get_vector_legacy(data_set, concept_name):
 @app.route(
     "/rest/get-similarity/<data_set>/<concept_name_1>/<concept_name_2>", methods=["GET"]
 )
-def get_similarity(data_set, concept_name_1, concept_name_2):
+def get_similarity(data_set: str, concept_name_1: str, concept_name_2: str):
     data_sets = ["wordnet", "wiktionary", "babelnet", "alod", "dbpedia"]
     data_set = data_set.lower()
     if data_set not in data_sets:

@@ -55,8 +55,16 @@ def test_get_vector_json():
 
 
 def test_get_similarity():
-    assert True
+    result = qs.get_similarity(label_1="Hotel", label_2="Aero East Europe")
+    assert result is not None
 
 
 def test_get_similarity_json():
     assert True
+
+
+def get_triple_score():
+    result = qs.get_triple_score(
+        subject_label="Hotel", predicate_label="Aero East Europe", object_label="Lake"
+    )
+    assert result is not None
