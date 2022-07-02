@@ -327,7 +327,7 @@ def closest_concepts_legacy(data_set, top_n, concept_name) -> Union[None, str]:
 
 
 @app.route(
-    "/rest/v2/get-vector/<dataset>/<dataset_version>/<model>/<model_version>/<subject>/<predicate>/<object>",
+    "/rest/v2/get-triple-score/<dataset>/<dataset_version>/<model>/<model_version>/<subject>/<predicate>/<object>",
     methods=["GET"],
 )
 def get_triple_score(
